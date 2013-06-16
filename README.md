@@ -59,7 +59,7 @@ The extension requires compilation in Linux. This requires:
 + Qt4 (libqt4-core, libqt4-gui, libqt4-network, libqt4-webkit,
   qt4-qmake, libicu48)
 
-In phpbrowserext directory: 
+Follow these steps:
 
 1.  For compilation you must run the build script
 

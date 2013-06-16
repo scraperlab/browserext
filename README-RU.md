@@ -61,7 +61,7 @@ PHP расширение BrowserExt представляет собой упра
 + Qt4 и qmake (libqt4-core, libqt4-gui, libqt4-network, libqt4-webkit,
   qt4-qmake, libicu48)
 
-В директории phpbrowserext: 
+Для компиляции сделайте следующее: 
 
 1.  Для компиляции необходимо запустить
 
