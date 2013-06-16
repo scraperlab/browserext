@@ -4,7 +4,7 @@ Description of the classes of the BrowserExt php extension
 class PhpBrowser
 ----------------
 
-### Property downloadDirectory
+### property downloadDirectory
 
 `public $downloadDirectory;`
 
@@ -15,21 +15,21 @@ when you click on the link to the file. The default is:
     __DIR__.'/download'
 
 
-### Property proxyCheckThreads
+### property proxyCheckThreads
 
 `public $proxyCheckThreads = 5;`
 
 Sets the number of threads to test proxy servers. The default is 5.
 
 
-### Method __construct()
+### method __construct()
 
 `public __construct();`
 
 Constructor.
 
 
-### Method load
+### method load
 
 `public bool load(string $url[, bool $samewnd=false]);`
 
@@ -38,14 +38,14 @@ the page will be loaded in the same tab or in a new one.
 If successful load returns true, otherwise false.
 
 
-### Method title
+### method title
 
 `public string title();`
 
 Returns the title of the current page.
 
 
-### Method click
+### method click
 
 `public bool click(string $xpath[, bool $samewnd=false]);`
 
@@ -54,7 +54,7 @@ it will load in a new tab. To load in the same tab, set the
 $samewnd = true. If successful load returns true, otherwise false.
 
 
-### Method elements
+### method elements
 
 `public array elements(string $xpath);`
 
@@ -62,7 +62,7 @@ Fetches the document elements by xpath. Returns an array of objects
 of class PhpWebElement. If no element is found returns an empty array.
 
 
-### Method download
+### method download
 
 `public int download(string $url, string $dest);`
 
@@ -71,21 +71,21 @@ the file name. Returns 0 if an error occurred and 1 if the download
 was successful.
 
 
-### Method back
+### method back
 
 `public back();`
 
 Moves to the previous tab. The current tab is closed.
 
 
-### Method wait
+### method wait
 
 `public wait(int $seconds);`
 
 Waiting for a time specified by the parameter $seconds.
 
 
-### Method scroll
+### method scroll
 
 `public bool scroll(int $screens);`
 
@@ -109,7 +109,7 @@ at the end of a page. The algorithm may be as follows:
     }
 
 
-### Method fill
+### method fill
 
 `public bool fill(string $xpath, string $value);`
 
@@ -120,7 +120,7 @@ elements is taken only the first.
 If the element is found returns true, otherwise false.
 
 
-### Method check
+### method check
 
 `public bool check(string $xpath);`
 
@@ -128,7 +128,7 @@ Checks the checkbox, given by xpath expression.
 If the element is found returns true, otherwise false.
 
 
-### Method uncheck
+### method uncheck
 
 `public bool uncheck(string $xpath);`
 
@@ -136,7 +136,7 @@ Resets the checkbox, given by xpath expression.
 If the element is found returns true, otherwise false.
 
 
-### Method radio
+### method radio
 
 `public bool radio(string $xpath);`
 
@@ -144,7 +144,7 @@ Sets the radio element, given by xpath expression.
 If the element is found returns true, otherwise false.
 
 
-### Method select
+### method select
 
 `public bool select(string $xpath);`
 
@@ -154,7 +154,7 @@ with option tag, which is selected.
 If the element is found returns true, otherwise false.
 
 
-### Method selectByText
+### method selectByText
 
 `public bool selectByText(string $xpath, string $text);`
 
@@ -164,7 +164,7 @@ $text specifies the text to be selected.
 If the element is found returns true, otherwise false.
 
 
-### Method selectByValue
+### method selectByValue
 
 `public bool selectByValue(string $xpath, string $value);`
 
@@ -175,7 +175,7 @@ to be selected.
 If the element is found returns true, otherwise false.
 
 
-### Method fillfile
+### method fillfile
 
 `public bool fillfile(string $xpath, string $value);`
 
@@ -186,7 +186,7 @@ elements is taken only the first.
 If the element is found returns true, otherwise false.
 
 
-### Method setProxyList
+### method setProxyList
 
 `public int setProxyList(array $proxies[, bool ischeck=true]);`
 
@@ -202,7 +202,7 @@ The number of threads to test the proxy server is set by property
 proxyCheckThreads.
 
 
-### Method proxyList
+### method proxyList
 
 `public array proxyList();`
 
@@ -210,42 +210,42 @@ Returns an array of proxies used in the browser. When proxies were tested,
 returning only working servers.
 
 
-### Method html
+### method html
 
 `public string html();`
 
 Returns the html of the current page.
 
 
-### Method show
+### method show
 
 `public show();`
 
 Shows the browser window.
 
 
-### Method hide
+### method hide
 
 `public hide();`
 
 Hides the browser window.
 
 
-### Method url
+### method url
 
 `public string url();`
 
 Returns the url of the current browser page.
 
 
-### Method requestedUrl
+### method requestedUrl
 
 `public string requestedUrl();`
 
 Returns the requested url of the current browser page.
 
 
-### Method setHtml
+### method setHtml
 
 `public setHtml(string $html);`
 
@@ -256,7 +256,7 @@ Sets the html of the current page.
 class PhpWebElement
 -------------------
 
-### Method attr
+### method attr
 
 `public string attr(string $name);`
 
@@ -264,7 +264,7 @@ Returns the value of attribute by name.
 If the attribute is not found, returns an empty string.
 
 
-### Method attrAll
+### method attrAll
 
 `public array attrAll();`
 
@@ -272,14 +272,14 @@ Returns an associative array of name=>value pairs of all
 attributes of the element.
 
 
-### Method tagName
+### method tagName
 
 `public string tagName();`    
 
 Returns the element tagname.
 
 
-### Method prop
+### method prop
 
 `public string prop(string $name);`
 
@@ -287,7 +287,7 @@ Returns the property value of the element.
 Member properties are specified by the DOM model.
 
 
-### Method textAll
+### method textAll
 
 `public string textAll();`
 
@@ -301,7 +301,7 @@ then textAll() returns
     abc 123 345
 
 
-### Method text
+### method text
 
 `public string text();`
 
@@ -316,21 +316,21 @@ then text() returns
     abc 345
 
 
-### Method html
+### method html
 
 `public string html();`
 
 Returns the inner html of the element.
 
 
-### Method getXPath
+### method getXPath
 
 `public string getXPath();`
 
 Returns the xpath of the element.
 
 
-### Method parent
+### method parent
 
 `public PhpWebElement parent();`
 
@@ -339,7 +339,7 @@ then the method isNull of the returning element
 returns true.
 
  
-### Method nextSibling
+### method nextSibling
 
 `public PhpWebElement nextSibling();`
 
@@ -350,7 +350,7 @@ of the returning element returns true.
         $el = $el->nextSibling();
 
 
-### Method prevSibling
+### method prevSibling
 
 `public PhpWebElement prevSibling();`
 
@@ -361,7 +361,7 @@ the method isNull of the returning element returns true.
         $el = $el->prevSibling();
 
 
-### Method firstChild
+### method firstChild
 
 `public PhpWebElement firstChild();`
 
@@ -370,7 +370,7 @@ If the child is not present, then the method isNull of the
 returning element returns true.
 
 
-### Method lastChild
+### method lastChild
 
 `public PhpWebElement lastChild();`
 
@@ -379,7 +379,7 @@ If the child is not present, then the method isNull of the
 returning element returns true.
 
 
-### Method isNull
+### method isNull
 
 `public bool isNull();`
 
@@ -388,7 +388,7 @@ i.e. element is missing. See the description of the methods parent,
 nextSibling, prevSibling, firstChild, lastChild.
 
 
-### Method elements
+### method elements
 
 `public array elements(string $xpath);`
 
@@ -402,7 +402,7 @@ inside the $el1 you can write:
 The point specifies the current context.
 
 
-### Method click
+### method click
 
 `public bool click();`
 

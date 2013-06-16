@@ -16,6 +16,7 @@ and intended for web scraping.
 + Allows to scroll the page vertically
 + Supports a list of proxy servers, checking proxies in few threads
 
+A short example:
 
     $br = new PhpBrowser();
     $br->load('http://localhost/index.html');

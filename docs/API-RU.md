@@ -4,7 +4,7 @@
 class PhpBrowser
 ----------------
 
-### Свойство downloadDirectory
+### свойство downloadDirectory
 
 `public $downloadDirectory;`
 
@@ -15,7 +15,7 @@ class PhpBrowser
     __DIR__.'/download'
 
 
-### Свойство proxyCheckThreads
+### свойство proxyCheckThreads
 
 `public $proxyCheckThreads = 5;`
 
@@ -23,14 +23,14 @@ class PhpBrowser
 По-умолчнию равно 5.
 
 
-### Метод __construct()
+### метод __construct()
 
 `public __construct();`
 
 Конструктор.
 
 
-### Метод load
+### метод load
 
 `public bool load(string $url[, bool $samewnd=false]);`
 
@@ -39,14 +39,14 @@ class PhpBrowser
 удачной загрузке возвращает true, иначе false.
 
 
-### Метод title
+### метод title
 
 `public string title();`
 
 Возвращает заголовок текущей страницы.
 
 
-### Метод click
+### метод click
 
 `public bool click(string $xpath[, bool $samewnd=false]);`
 
@@ -56,7 +56,7 @@ class PhpBrowser
 При удачной загрузке возвращает true, иначе false.
 
 
-### Метод elements
+### метод elements
 
 `public array elements(string $xpath);`
 
@@ -65,7 +65,7 @@ class PhpBrowser
 возвращает пустой массив.
 
 
-### Метод download
+### метод download
 
 `public int download(string $url, string $dest);`
 
@@ -74,21 +74,21 @@ class PhpBrowser
 прошло успешно.
 
 
-### Метод back
+### метод back
 
 `public back();`
 
 Переходит к предыдущей вкладке. Текущая вкладка закрывается.
 
 
-### Метод wait
+### метод wait
 
 `public wait(int $seconds);`
 
 Ждет некоторое время, заданное в параметре $seconds.
 
 
-### Метод scroll
+### метод scroll
 
 `public bool scroll(int $screens);`
 
@@ -113,7 +113,7 @@ class PhpBrowser
     }
 
 
-### Метод fill
+### метод fill
 
 `public bool fill(string $xpath, string $value);`
 
@@ -124,7 +124,7 @@ class PhpBrowser
 Если элемент найден возвращается true, иначе false.
 
 
-### Метод check
+### метод check
 
 `public bool check(string $xpath);`
 
@@ -132,7 +132,7 @@ class PhpBrowser
 Если элемент найден возвращается true, иначе false.
 
 
-### Метод uncheck
+### метод uncheck
 
 `public bool uncheck(string $xpath);`
 
@@ -140,7 +140,7 @@ class PhpBrowser
 Если элемент найден возвращается true, иначе false.
 
 
-### Метод radio
+### метод radio
 
 `public bool radio(string $xpath);`
 
@@ -149,7 +149,7 @@ class PhpBrowser
 Если элемент найден возвращается true, иначе false.
 
 
-### Метод select
+### метод select
 
 `public bool select(string $xpath);`
 
@@ -159,7 +159,7 @@ c тегом option, который будет выбран.
 Если элемент найден возвращается true, иначе false.
 
 
-### Метод selectByText
+### метод selectByText
 
 `public bool selectByText(string $xpath, string $text);`
 
@@ -169,7 +169,7 @@ $text задает текст, который следует выбрать.
 Если элемент найден возвращается true, иначе false.
 
 
-### Метод selectByValue
+### метод selectByValue
 
 `public bool selectByValue(string $xpath, string $value);`
 
@@ -180,7 +180,7 @@ $value определяет значение аттрибута value элеме
 Если элемент найден возвращается true, иначе false.
 
 
-### Метод fillfile
+### метод fillfile
 
 `public bool fillfile(string $xpath, string $value);`
 
@@ -191,7 +191,7 @@ $value определяет значение аттрибута value элеме
 Если элемент найден возвращается true, иначе false.
 
 
-### Метод setProxyList
+### метод setProxyList
 
 `public int setProxyList(array $proxies[, bool ischeck=true]);`
 
@@ -206,7 +206,7 @@ $value определяет значение аттрибута value элеме
 proxyCheckThreads.
 
 
-### Метод proxyList
+### метод proxyList
 
 `public array proxyList();`
 
@@ -215,42 +215,42 @@ proxyCheckThreads.
 рабочие.
 
 
-### Метод html
+### метод html
 
 `public string html();`
 
 Возвращает html текущей страницы.
 
 
-### Метод show
+### метод show
 
 `public show();`
 
 Показывает окно браузера.
 
 
-### Метод hide
+### метод hide
 
 `public hide();`
 
 Скрывает окно браузера.
 
 
-### Метод url
+### метод url
 
 `public string url();`
 
 Возвращает url текущей страницы браузера.
 
 
-### Метод requestedUrl
+### метод requestedUrl
 
 `public string requestedUrl();`
 
 Возвращает запрошенный url текущей страницы браузера.
 
 
-### Метод setHtml
+### метод setHtml
 
 `public setHtml(string $html);`
 
@@ -261,7 +261,7 @@ proxyCheckThreads.
 class PhpWebElement
 -------------------
 
-### Метод attr
+### метод attr
 
 `public string attr(string $name);`
 
@@ -269,21 +269,21 @@ class PhpWebElement
 Если аттрибут не найден возвращается пустая строка.
 
 
-### Метод attrAll
+### метод attrAll
 
 `public array attrAll();`
 
 Возвращает ассоциативный массив имя=>значение всех аттрибутов
 элемента.
 
-### Метод tagName
+### метод tagName
 
 `public string tagName();`    
 
 Возвращает тэг элемента.
 
 
-### Метод prop
+### метод prop
 
 `public string prop(string $name);`
 
@@ -291,7 +291,7 @@ class PhpWebElement
 Свойства элементов определяются моделью DOM документа.
 
 
-### Метод textAll
+### метод textAll
 
 `public string textAll();`
 
@@ -305,7 +305,7 @@ class PhpWebElement
     abc 123 345
 
 
-### Метод text
+### метод text
 
 `public string text();`
 
@@ -320,21 +320,21 @@ class PhpWebElement
     abc 345
 
 
-### Метод html
+### метод html
 
 `public string html();`
 
 Возвращает inner html элемента.
 
 
-### Метод getXPath
+### метод getXPath
 
 `public string getXPath();`
 
 Возвращает xpath элемента.
 
 
-### Метод parent
+### метод parent
 
 `public PhpWebElement parent();`
 
@@ -343,7 +343,7 @@ class PhpWebElement
 будет равен true.
 
  
-### Метод nextSibling
+### метод nextSibling
 
 `public PhpWebElement nextSibling();`
 
@@ -356,7 +356,7 @@ class PhpWebElement
         $el = $el->nextSibling();
 
 
-### Метод prevSibling
+### метод prevSibling
 
 `public PhpWebElement prevSibling();`
 
@@ -369,7 +369,7 @@ class PhpWebElement
         $el = $el->prevSibling();
 
 
-### Метод firstChild
+### метод firstChild
 
 `public PhpWebElement firstChild();`
 
@@ -378,7 +378,7 @@ class PhpWebElement
 возвращаемого элемента будет равен true.
 
 
-### Метод lastChild
+### метод lastChild
 
 `public PhpWebElement lastChild();`
 
@@ -387,7 +387,7 @@ class PhpWebElement
 возвращаемого элемента будет равен true.
 
 
-### Метод isNull
+### метод isNull
 
 `public bool isNull();`
 
@@ -397,7 +397,7 @@ true если это NULL элемент, т.е. элемент отсутств
 firstChild, lastChild. 
 
 
-### Метод elements
+### метод elements
 
 `public array elements(string $xpath);`
 
@@ -411,7 +411,7 @@ firstChild, lastChild.
 Точка задает текущий контекст.
 
 
-### Метод click
+### метод click
 
 `public bool click();`
 
