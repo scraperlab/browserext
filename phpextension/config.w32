@@ -1,0 +1,46 @@
+ARG_WITH("browserext", "Enable browserext support", "yes");
+var QTDIR = WshShell.Environment("Process").Item("QTDIR");
+
+if (PHP_BROWSEREXT != "no")
+{
+    if ((PHP_DEBUG != "yes" && CHECK_LIB("QtCore4.lib", "browserext", QTDIR + "\\lib;" + PHP_BROWSEREXT) &&
+        CHECK_LIB("QtGui4.lib", "browserext", QTDIR + "\\lib;" + PHP_BROWSEREXT) &&
+        CHECK_LIB("QtWebKit4.lib", "browserext", QTDIR + "\\lib;" + PHP_BROWSEREXT) &&
+        CHECK_LIB("QtNetwork4.lib", "browserext", QTDIR + "\\lib;" + PHP_BROWSEREXT) &&
+        CHECK_LIB("QtXmlPatterns4.lib", "browserext", QTDIR + "\\lib;" + PHP_BROWSEREXT) &&
+        CHECK_LIB("phpbrowser_a.lib", "browserext", PHP_BROWSEREXT))
+            || (PHP_DEBUG == "yes" && 
+                CHECK_LIB("QtCored4.lib", "browserext", QTDIR + "\\lib;" + PHP_BROWSEREXT) &&
+                CHECK_LIB("QtGuid4.lib", "browserext", QTDIR + "\\lib;" + PHP_BROWSEREXT) &&
+                CHECK_LIB("QtWebKitd4.lib", "browserext", QTDIR + "\\lib;" + PHP_BROWSEREXT) &&
+                CHECK_LIB("QtNetworkd4.lib", "browserext", QTDIR + "\\lib;" + PHP_BROWSEREXT) &&
+                CHECK_LIB("QtXmlPatternsd4.lib", "browserext", QTDIR + "\\lib;" + PHP_BROWSEREXT) &&
+                CHECK_LIB("phpbrowser_a_debug.lib", "browserext", PHP_BROWSEREXT))
+       )
+    {
+        if (CHECK_HEADER_ADD_INCLUDE("QtCore/QtCore", "CFLAGS_BROWSEREXT", QTDIR + "\\include;" + PHP_BROWSEREXT) &&
+            CHECK_HEADER_ADD_INCLUDE("QtCore", "CFLAGS_BROWSEREXT", QTDIR + "\\include\\QtCore;" + PHP_BROWSEREXT) &&
+            CHECK_HEADER_ADD_INCLUDE("QtGui", "CFLAGS_BROWSEREXT", QTDIR + "\\include\\QtGui;" + PHP_BROWSEREXT) &&
+            CHECK_HEADER_ADD_INCLUDE("QtWebKit", "CFLAGS_BROWSEREXT", QTDIR + "\\include\\QtWebKit;" + PHP_BROWSEREXT) &&
+            CHECK_HEADER_ADD_INCLUDE("QtNetwork", "CFLAGS_BROWSEREXT", QTDIR + "\\include\\QtNetwork;" + PHP_BROWSEREXT) &&
+            CHECK_HEADER_ADD_INCLUDE("QtXmlPatterns", "CFLAGS_BROWSEREXT", QTDIR + "\\include\\QtXmlPatterns;" + PHP_BROWSEREXT) &&
+            CHECK_HEADER_ADD_INCLUDE("qplatformdefs.h", "CFLAGS_BROWSEREXT", QTDIR + "\\mkspecs\\default;" + PHP_BROWSEREXT) &&
+            CHECK_HEADER_ADD_INCLUDE("phpbrowser.h", "CFLAGS_BROWSEREXT", PHP_SRC_DIR + "\\ext\\browserext;" + PHP_BROWSEREXT)
+           )
+        {
+            EXTENSION("browserext", "browserext.cpp", true, " /Zc:wchar_t- /D UNICODE ");
+            if (PHP_BROWSEREXT_SHARED) {
+    			//ADD_FLAG("CFLAGS_BROWSEREXT", "/D PHP_BROWSEREXT_EXPORTS ");
+	        }
+        }
+        else
+        {
+            WARNING("browserext not enabled; headers not found");
+        }
+    }
+    else
+    {
+        WARNING("browserext not enabled; libraries not found");
+    }
+    
+}
