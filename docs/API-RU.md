@@ -101,16 +101,18 @@ class PhpBrowser
 подгружают содержимое при достижении конца страницы. Алгоритм может
 быть следующий:
 
-    $res = true;
-    for ($i=0; $i<500 && $res; $i++)
+```php
+$res = true;
+for ($i=0; $i<500 && $res; $i++)
+{
+    $res = $browser->scroll(1);
+    if (!$res)
     {
+        $browser->wait(3);
         $res = $browser->scroll(1);
-        if (!$res)
-        {
-            $browser->wait(3);
-            $res = $browser->scroll(1);
-        }
     }
+}
+```
 
 
 ### метод fill
@@ -200,7 +202,9 @@ $value определяет значение аттрибута value элеме
 тестироваться прокси. Список прокси-серверов задается массивом строк,
 каждая строка задает отдельный сервер, например
 
-    $proxies = array('192.168.0.2:3128', 'user:psw@example.com:8080');
+```php
+$proxies = array('192.168.0.2:3128', 'user:psw@example.com:8080');
+```
 
 Количество потоков для тестирования прокси-серверов задается свойством
 proxyCheckThreads.
@@ -352,8 +356,10 @@ class PhpWebElement
 последний, то метод isNull возвращаемого PhpWebElement
 будет равен true.
 
-    while (!$el->isNull())
-        $el = $el->nextSibling();
+```php
+while (!$el->isNull())
+    $el = $el->nextSibling();
+```
 
 
 ### метод prevSibling
@@ -365,8 +371,10 @@ class PhpWebElement
 первый, то метод isNull возвращаемого PhpWebElement
 будет равен true.
 
-    while (!$el->isNull())
-        $el = $el->prevSibling();
+```php
+while (!$el->isNull())
+    $el = $el->prevSibling();
+```
 
 
 ### метод firstChild
@@ -406,7 +414,9 @@ firstChild, lastChild.
 возвращается пустой массив. Например, чтобы выбрать все ссылки
 внутри элемента $el1 можно написать:
 
-    $el1->elements('.//a');
+```php
+$el1->elements('.//a');
+```
 
 Точка задает текущий контекст.
 

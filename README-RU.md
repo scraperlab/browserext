@@ -19,20 +19,22 @@ PHP расширение BrowserExt представляет собой упра
 
 Короткий пример:
 
-    $br = new PhpBrowser();
-    $br->load('http://localhost/index.html');
+```php
+$br = new PhpBrowser();
+$br->load('http://localhost/index.html');
     
-    //получаем все ссылки на файлы
-    $links = $br->elements('//div[@id="files"]/a');
-    foreach ($links as $l)
-    {
-        //получаем свойство href
-        $href = $l->prop('href');
-        //скачиваем файл по ссылке в href и сохраняем в С:\test
-        $br->download($href, 'C:\\test\\'.basename($href));
-    }
-
+//получаем все ссылки на файлы
+$links = $br->elements('//div[@id="files"]/a');
+foreach ($links as $l)
+{
+    //получаем свойство href
+    $href = $l->prop('href');
+    //скачиваем файл по ссылке в href и сохраняем в С:\test
+    $br->download($href, 'C:\\test\\'.basename($href));
+}
+```
  
+
 Установка
 ---------
 
@@ -120,11 +122,15 @@ PHP расширение BrowserExt представляет собой упра
 
 Для начала необходимо создать класс браузера:
 
-    $br = new PhpBrowser();
+```php
+$br = new PhpBrowser();
+```
 
 Затем загрузить страницу:
 
-    $br->load('http://localhost'); 
+```php
+$br->load('http://localhost'); 
+```
 
 Каждая страница загружается в новой вкладке, для загрузки
 в той же вкладке необходимо передать второй параметр равный true.
@@ -132,34 +138,42 @@ PHP расширение BrowserExt представляет собой упра
 
 Можно кликнуть на ссылку или кнопку, указав ее xpath.
 
-    $br->click('//input[@type="submit"]');
+```php
+$br->click('//input[@type="submit"]');
+```
 
 Страница будет загружена в новой вкладке, для загрузки в той
 же вкладке необходимо передать второй параметр как true.
 
 Можно выбрать элементы по xpath:
 
-    $els = $br->elements('//a');
+```php
+$els = $br->elements('//a');
+```
 
 Данный метод возвращает массив объектов класса PhpWebElement.
 У каждого элемента можно получить атрибуты, свойства, тег,
 значение элемента:
 
-    $id = $els[0]->attr('id');
-    $prop = $els[0]->prop('href');
-    $tag = $els[0]->tagName();
-    $text = $els[0]->text();
+```php
+$id = $els[0]->attr('id');
+$prop = $els[0]->prop('href');
+$tag = $els[0]->tagName();
+$text = $els[0]->text();
+```
 
 Можно перейти к родительскому или к дочерним элементам, они
 также будут представлять собой объекты класса PhpWebElement:
 
-    $parent = $els[0]->parent();
-    $arr = array();
-    while (!$parent->isNull())
-    {
-        $arr[] = $parent->tagName();
-        $parent = $parent->parent();
-    }
+```php
+$parent = $els[0]->parent();
+$arr = array();
+while (!$parent->isNull())
+{
+    $arr[] = $parent->tagName();
+    $parent = $parent->parent();
+}
+```
 
 В примере выше производится проход по всем родительским элементам
 и сохранение их тегов в массиве.
@@ -179,16 +193,20 @@ PHP расширение BrowserExt представляет собой упра
 
 Можно узнать xpath элемента или кликнуть на элементе:
 
-    $xp = $items[0]->getXPath();
-    $items[0]->click();
+```php
+$xp = $items[0]->getXPath();
+$items[0]->click();
+```
 
 Браузер может использовать список прокси-серверов для загрузки
 страниц. Каждая новая страница загружается с новым прокси, если
 их несколько.
 
-    $proxy = array('192.168.0.2:3128', 'user:psw@example.com:8888');
-    $br->setProxyList($proxy, true);
-    var_dump($br->proxyList());
+```php
+$proxy = array('192.168.0.2:3128', 'user:psw@example.com:8888');
+$br->setProxyList($proxy, true);
+var_dump($br->proxyList());
+```
 
 В вышеприведенном примере задается массив из двух прокси и передается
 в браузер. Второй параметр определяет - надо ли тестировать прокси.

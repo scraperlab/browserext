@@ -18,19 +18,20 @@ and intended for web scraping.
 
 A short example:
 
-    $br = new PhpBrowser();
-    $br->load('http://localhost/index.html');
-    
-    //retrieves all links to files
-    $links = $br->elements('//div[@id="files"]/a');
-    foreach ($links as $l)
-    {
-        //extracts href property
-        $href = $l->prop('href');
-        //downloads a file by href link and saves it in С:\test
-        $br->download($href, 'C:\\test\\'.basename($href));
-    }
+```php
+$br = new PhpBrowser();
+$br->load('http://localhost/index.html');
 
+//retrieves all links to files
+$links = $br->elements('//div[@id="files"]/a');
+foreach ($links as $l)
+{
+    //extracts href property
+    $href = $l->prop('href');
+    //downloads a file by href link and saves it in С:\test
+    $br->download($href, 'C:\\test\\'.basename($href));
+}
+```
 
 
 Installation
@@ -117,11 +118,15 @@ Usage
 
 First you need to create a browser class:
 
-    $br = new PhpBrowser();
+```php
+$br = new PhpBrowser();
+```
 
 Next lets loading the page:
 
-    $br->load('http://localhost');
+```php
+$br->load('http://localhost');
+```
 
 Each page is loaded in a new tab. To load in the same tab,
 you must pass a second parameter to true.
@@ -129,61 +134,75 @@ To go to the previous page you call the `back()`.
 
 You can click on a link or button, passing its xpath.
 
-    $br->click('//input[@type="submit"]');  
+```php
+$br->click('//input[@type="submit"]');  
+```
 
 The page will be loaded in a new tab, to load in same tab,
 you must pass a second parameter to true.
 
 You can select elements by xpath:
 
-    $els = $br->elements('//a');
+```php
+$els = $br->elements('//a');
+```
 
 This method returns an array of objects of class PhpWebElement.
 For each element you can retrieve attributes, properties, tag name,
 element value and others:
 
-    $id = $els[0]->attr('id');
-    $prop = $els[0]->prop('href');
-    $tag = $els[0]->tagName();
-    $text = $els[0]->text();
+```php
+$id = $els[0]->attr('id');
+$prop = $els[0]->prop('href');
+$tag = $els[0]->tagName();
+$text = $els[0]->text();
+```
 
 You can go to the parent or to the child elements, they will
 also be an objects of PhpWebElement class:
 
-    $parent = $els[0]->parent();
-    $arr = array();
-    while (!$parent->isNull())
-    {
-        $arr[] = $parent->tagName();
-        $parent = $parent->parent();
-    }
+```php
+$parent = $els[0]->parent();
+$arr = array();
+while (!$parent->isNull())
+{
+    $arr[] = $parent->tagName();
+    $parent = $parent->parent();
+}
+```
 
 In the above we iterate through all parents and stores its tags in an array.
 
 For element can be performed a relative xpath:
 
-    $items = $br->elements('//*[@class="item"]');
-    foreach ($items as $item)
-    {
-        $a1 = $item->elements('./a[1]');
-        $a2 = $item->elements('./a[2]');
-        echo $item->tagName().' '.$a1[0]->text().' '.$a2[0]->text();
-    }
+```php
+$items = $br->elements('//*[@class="item"]');
+foreach ($items as $item)
+{
+    $a1 = $item->elements('./a[1]');
+    $a2 = $item->elements('./a[2]');
+    echo $item->tagName().' '.$a1[0]->text().' '.$a2[0]->text();
+}
+```
 
 This code loops through all the elements with a class item and
 displays the text of the first and second links.
 
 You can retrieve the xpath of the element or click on it:
 
-    $xp = $items[0]->getXPath();
-    $items[0]->click();
+```php
+$xp = $items[0]->getXPath();
+$items[0]->click();
+```
 
 The browser can use a list of proxy servers for loading pages.
-Each new page is loaded with by new proxy, if there are several:
+Each new page is loaded with new proxy:
 
-    $proxy = array('192.168.0.2:3128', 'user:psw@example.com:8888');
-    $br->setProxyList($proxy, true);
-    var_dump($br->proxyList());
+```php
+$proxy = array('192.168.0.2:3128', 'user:psw@example.com:8888');
+$br->setProxyList($proxy, true);
+var_dump($br->proxyList());
+```
 
 In the above given an array of two proxies and pass to the browser.
 The second parameter specifies the need to check the proxy. Next command

@@ -97,16 +97,18 @@ it returns false.
 This method may be used for pages that dynamically loads the contents
 at the end of a page. The algorithm may be as follows:
 
-    $res = true;
-    for ($i=0; $i<500 && $res; $i++)
+```php
+$res = true;
+for ($i=0; $i<500 && $res; $i++)
+{
+    $res = $browser->scroll(1);
+    if (!$res)
     {
+        $browser->wait(3);
         $res = $browser->scroll(1);
-        if (!$res)
-        {
-            $browser->wait(3);
-            $res = $browser->scroll(1);
-        }
     }
+}
+```
 
 
 ### method fill
@@ -196,7 +198,9 @@ $ischeck parameter determines whether the proxies will be tested.
 Proxy server list is given an array of strings, each row identifies
 a separate server, for example
 
-    $proxies = array('192.168.0.2:3128', 'user:psw@example.com:8080');
+```php
+$proxies = array('192.168.0.2:3128', 'user:psw@example.com:8080');
+```
 
 The number of threads to test the proxy server is set by property
 proxyCheckThreads.
@@ -346,8 +350,10 @@ returns true.
 Returns the next sibling element. If the element is last, the method isNull
 of the returning element returns true.
 
-    while (!$el->isNull())
-        $el = $el->nextSibling();
+```php
+while (!$el->isNull())
+    $el = $el->nextSibling();
+```
 
 
 ### method prevSibling
@@ -357,8 +363,10 @@ of the returning element returns true.
 Returns the previous sibling element. If the element is first,
 the method isNull of the returning element returns true.
 
-    while (!$el->isNull())
-        $el = $el->prevSibling();
+```php
+while (!$el->isNull())
+    $el = $el->prevSibling();
+```
 
 
 ### method firstChild
@@ -397,7 +405,9 @@ an array of objects of class PhpWebElement. If the elements are not found
 returns an empty array. For example, to select all the links
 inside the $el1 you can write:
 
-    $el1->elements('.//a');
+```php
+$el1->elements('.//a');
+```
 
 The point specifies the current context.
 
