@@ -135,9 +135,12 @@ void XPathInspector::setActiveElement(const QWebElement & elem, bool select)
 
 void XPathInspector::closeEvent(QCloseEvent * event)
 {
-	//if (!activeElement.isNull())
-		//activeElement.setStyleProperty("border", activeOldStyle);
 	selectElements(false);
+
+	QList<QWebElement> tmp(webview->selectedElements);
+	for (int i=0; i<tmp.count(); i++)
+		webview->selectElement(tmp[i], false);
+
 	QWidget::closeEvent(event);
 }
 

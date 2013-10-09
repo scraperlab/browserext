@@ -1,6 +1,8 @@
 #ifndef PHPBROWSER_H
 #define PHPBROWSER_H
 
+/* Header file from browserext-static library */
+
 #include <QtGui>
 #include <QtWebKit>
 #include <QtNetwork>
@@ -9,6 +11,7 @@
 
 
 class PhpBrowser;
+class XPathInspector;
 
 
 class PhpWebPage : public QWebPage
@@ -96,6 +99,7 @@ public:
 
 	friend class PhpWebPage;
 	friend class PhpBrowser;
+	friend class XPathInspector;
 
 protected:
 	QPoint rightClick;
