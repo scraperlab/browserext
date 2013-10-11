@@ -180,13 +180,15 @@ while (!$parent->isNull())
 
 Для элемента можно выполнить относительный xpath:
 
-    $items = $br->elements('//*[@class="item"]');
-    foreach ($items as $item)
-    {
-        $a1 = $item->elements('./a[1]');
-        $a2 = $item->elements('./a[2]');
-        echo $item->tagName().' '.$a1[0]->text().' '.$a2[0]->text();
-    }
+```php
+$items = $br->elements('//*[@class="item"]');
+foreach ($items as $item)
+{
+    $a1 = $item->elements('./a[1]');
+    $a2 = $item->elements('./a[2]');
+    echo $item->tagName().' '.$a1[0]->text().' '.$a2[0]->text();
+}
+```
 
 Этот код перебирает все элементы с классом item и выводит
 текст первой и второй ссылки.
