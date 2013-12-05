@@ -61,7 +61,7 @@ foreach ($links as $l)
 + make
 + php 5.3 или 5.4 (php5, php5-dev)
 + Qt4 и qmake (libqt4-core, libqt4-gui, libqt4-network, libqt4-webkit,
-  qt4-qmake, libicu48)
+  qt4-qmake, libicu48, libqt4-dev)
 
 Для компиляции сделайте следующее: 
 
