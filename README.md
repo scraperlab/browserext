@@ -1,6 +1,8 @@
 BrowserExt - php extension for web scraping and browser emulation
 =================================================================
 
+WARNING! Experimental project. Works in 32 bit Linux only. Tested with php 5.3 and 5.4.
+
 Features
 --------
 
