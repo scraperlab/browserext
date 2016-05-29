@@ -880,6 +880,31 @@ PHP_METHOD(PhpBrowser, setHtml)
 }
 
 
+PHP_METHOD(PhpBrowser, setImageLoading)
+{
+    PhpBrowser *browser;
+    zend_bool zload = 1;
+    bool isload;
+
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
+    browser = obj->browser;
+        
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "b",
+                        &zload) == FAILURE) {
+        RETURN_NULL();
+    }
+        
+    if (browser != NULL) {
+        isload = zload != 0;
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "setImageLoading", ct, Q_ARG(bool, isload));
+    }
+    else {
+        RETURN_NULL();
+    }
+}
+
+
 
 phpwebelement_object* phpwebelement_object_new(zend_class_entry *type TSRMLS_DC)
 {
@@ -1381,6 +1406,41 @@ PHP_METHOD(PhpWebElement, attrAll)
 }
 
 
+PHP_METHOD(PhpWebElement, jsexec)
+{
+    PhpBrowser *browser;
+    WebElementTS *webelement = NULL;
+    char *str;
+    int str_len;
+    int res;
+
+    phpwebelement_object *obj = (phpwebelement_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
+    webelement = obj->webelement;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s",
+                        &str, &str_len) == FAILURE) {
+        RETURN_NULL();
+    }
+
+    if (webelement) {
+        phpbrowser_object *obj2 = (phpbrowser_object *) zend_object_store_get_object_by_handle(obj->browser_handle TSRMLS_CC);
+        browser = obj2->browser;
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "jsexec", ct, Q_RETURN_ARG(int, res), Q_ARG(WebElementTS*, webelement), Q_ARG(const char *, str));
+        if (res != 0) {
+            RETURN_TRUE;
+        }
+        else {
+            RETURN_FALSE;
+        }
+    }
+    else {
+        RETURN_FALSE;
+    }
+}
+
+
+
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phpbrowser_void, 0, 0, 0)
 ZEND_END_ARG_INFO()
@@ -1427,6 +1487,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phpbrowser_sethtml, 0, 0, 1)
     ZEND_ARG_INFO(0, url)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phpbrowser_setimageloading, 0, 0, 1)
+	ZEND_ARG_INFO(0, isload)
+ZEND_END_ARG_INFO()
+
 
 const zend_function_entry phpbrowser_methods[] = {
     PHP_ME(PhpBrowser,  __construct,     arginfo_phpbrowser_void, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
@@ -1454,6 +1518,7 @@ const zend_function_entry phpbrowser_methods[] = {
     PHP_ME(PhpBrowser,  url,             arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
     PHP_ME(PhpBrowser,  requestedUrl,    arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
     PHP_ME(PhpBrowser,  setHtml,         arginfo_phpbrowser_sethtml, ZEND_ACC_PUBLIC)    
+    PHP_ME(PhpBrowser,  setImageLoading, arginfo_phpbrowser_setimageloading, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL, 0, 0}
 };
 
@@ -1483,6 +1548,7 @@ const zend_function_entry phpwebelement_methods[] = {
     PHP_ME(PhpWebElement,  html,         arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
     PHP_ME(PhpWebElement,  elements,     arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
     PHP_ME(PhpWebElement,  click,        arginfo_phpwebelement_click, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpWebElement,  jsexec,       arginfo_phpwebelement_name, ZEND_ACC_PUBLIC)
     {NULL, NULL, NULL, 0, 0}
 };
 

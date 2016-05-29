@@ -42,6 +42,7 @@ PhpBrowser::PhpBrowser(bool canclose)
 	layout->addWidget(tab);
 	ProxyCheckThreads = 5;
 	currentProxy = -1;
+	isLoadImages = true;
 	CookieJar = new QNetworkCookieJar(this);
 	connect(tab, SIGNAL(currentChanged(int)), this, SLOT(handleTabChanged(int)));
 	connect(edit, SIGNAL(returnPressed()), this, SLOT(handleUrlChanged()));
@@ -69,6 +70,7 @@ void PhpBrowser::newTab()
 	connect(view, SIGNAL(urlChanged(const QUrl &)), this, SLOT(setEdit(const QUrl &)));
 
 	view->setPage(page);
+	view->settings()->setAttribute(QWebSettings::AutoLoadImages, isLoadImages);
 	QString label = (view->title() == "") ? "Noname" : view->title();
 	int pos = tab->addTab(view, label);
 	tab->setCurrentIndex(pos);
@@ -188,11 +190,13 @@ int PhpBrowser::fill(const char *xpath, const char *value)
 		&& (elem.attribute("type") == "text" || elem.attribute("type") == "password" || elem.attribute("type") == ""))
 	{
 		elem.setAttribute("value", QString(value));
+		elem.evaluateJavaScript("this.value = '"+QString(value)+"'");
 		return 1;
 	}
 	else if (elem.tagName().toLower() == "textarea")
 	{
 		elem.setPlainText(QString(value));
+		elem.evaluateJavaScript("this.value = '"+QString(value)+"'");
 		return 1;
 	}
 	return 0;
@@ -702,4 +706,19 @@ void PhpBrowser::setHtml(const char *html, const char *url)
 	QTextCodec *codec2 = QTextCodec::codecForHtml(QByteArray(html), codec);
 	QString str = codec2->toUnicode(html);
 	getTab()->page()->mainFrame()->setHtml(str, QUrl(QString(url)));
+}
+
+
+void PhpBrowser::setImageLoading(bool isload)
+{
+	isLoadImages = isload;
+}
+
+
+int PhpBrowser::jsexec(WebElementTS *elem, const char *js)
+{
+	if (!getTab()) return 0;
+	QWebElement elem2 = elem->getElement();
+	elem2.evaluateJavaScript(QString(js));
+	return 1;
 }

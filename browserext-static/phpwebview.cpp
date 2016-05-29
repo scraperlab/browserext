@@ -94,7 +94,8 @@ int PhpWebView::click(const QString & xpath, bool samewnd)
 	QApplication::sendEvent(browser, &releaseEvent);*/
 
 	QString js = "var e = document.createEvent('MouseEvents');";
-    js += "e.initEvent( 'click', true, true );";
+    //js += "e.initEvent( 'click', true, true );";
+	js += "e.initMouseEvent( 'click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);";
     js += "this.dispatchEvent(e);";
 	elem.evaluateJavaScript(js);
 	
@@ -123,7 +124,8 @@ int PhpWebView::click2(QWebElement elem, bool samewnd)
 	isNewViewBegin = false;
 	
 	QString js = "var e = document.createEvent('MouseEvents');";
-    js += "e.initEvent( 'click', true, true );";
+	//js += "e.initEvent( 'click', true, true );";
+    js += "e.initMouseEvent( 'click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);";
     js += "this.dispatchEvent(e);";
 	elem.evaluateJavaScript(js);
 	

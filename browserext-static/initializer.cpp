@@ -6,9 +6,8 @@ QApplication *pApp = NULL;
 
 Initializer::Initializer()
 {
-    int argc = 1;
-    char *argv[1];
-    argv[0] = "phpbrowser";
+    static int argc = 1;
+    static char *argv[1] = {"phpbrowser"};
     pApp = new QApplication(argc, argv);
     pApp->setQuitOnLastWindowClosed(false);
 

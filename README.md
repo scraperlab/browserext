@@ -1,7 +1,8 @@
 BrowserExt - php extension for web scraping and browser emulation
 =================================================================
 
-WARNING! Experimental project. Works in 32 bit Linux only. Tested with php 5.3 and 5.4.
+UPDATE: Now works in all php5 since 5.3 (php 5.3, 5.4, 5.5, 5.6) both 
+x32 and x64. It works with CLI and web server. Tested in Ubuntu.
 
 Features
 --------
@@ -39,7 +40,9 @@ foreach ($links as $l)
 Installation
 ------------
 
-### Linux
+### Linux (Ubuntu)
+
+There are instructions for Ubuntu, in other Linux packages may vary.
 
 It requires X11 Server. On the server without desktop you must use Xvfb.
 For loading Xvfb at system startup add this line to /etc/rc.local:
@@ -49,7 +52,7 @@ For loading Xvfb at system startup add this line to /etc/rc.local:
 For user, from which web server is running, you must set 
 the environment variable DISPLAY with server number with which
 the extension will work. For apache2 this can be done by adding
-this line to envvars file:
+this line to /etc/apache2/envvars file:
 
 `export DISPLAY=:0.0`
 
@@ -58,7 +61,7 @@ The extension requires compilation in Linux. This requires:
 
 + gcc (g++)
 + make
-+ php 5.3 or 5.4 (php5, php5-dev)
++ php 5 (php5, php5-dev)
 + Qt4 (libqt4-core, libqt4-gui, libqt4-network, libqt4-webkit,
   qt4-qmake, libicu48, libqt4-dev)
 

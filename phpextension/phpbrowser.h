@@ -11,6 +11,7 @@
 
 
 class PhpBrowser;
+class XPathInspector;
 
 
 class PhpWebPage : public QWebPage
@@ -98,6 +99,7 @@ public:
 
 	friend class PhpWebPage;
 	friend class PhpBrowser;
+	friend class XPathInspector;
 
 protected:
 	QPoint rightClick;
@@ -178,6 +180,8 @@ public Q_SLOTS:
 	void setDownloadDir(const char *dir);
 	char* getDownloadDir();
 	void setHtml(const char *html, const char *url = "");
+	void setImageLoading(bool isload);
+	int jsexec(WebElementTS *elem, const char *js);
 
 protected Q_SLOTS:
 	void setEdit(const QUrl & url);
@@ -206,6 +210,7 @@ protected:
 	QNetworkCookieJar *CookieJar;
 	int currentProxy;
 	bool canclose;
+	bool isLoadImages;
 public:
 	int ProxyCheckThreads;
 	QString downloadDirectory;
