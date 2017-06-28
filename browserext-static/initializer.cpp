@@ -6,7 +6,7 @@ QApplication *pApp = NULL;
 
 Initializer::Initializer()
 {
-    static int argc = 1;
+	static int argc = 1;
     static char *argv[1] = {"phpbrowser"};
     pApp = new QApplication(argc, argv);
     pApp->setQuitOnLastWindowClosed(false);
@@ -19,6 +19,8 @@ Initializer::Initializer()
 	qRegisterMetaType<WebElementTS*>("WebElementTS*");
     qRegisterMetaType<QList<WebElementTS*> >("QList<WebElementTS*>");
 	qRegisterMetaType<QWebElement>("QWebElement");
+	qRegisterMetaType<QString>("QString");
+	qRegisterMetaType<QMapParams>("QMapParams");
 	
     isMainLoopRunnig = false;
     //QTimer::singleShot(0, this, SLOT(createApp()));
@@ -29,8 +31,10 @@ Initializer::~Initializer()
     if (pApp)
     {
         pApp->quit();
+		QWebSettings::clearMemoryCaches();
         //if (mainwindow) delete mainwindow;
         delete pApp;
+		pApp = NULL;
     }
 }
 

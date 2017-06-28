@@ -15,12 +15,14 @@ class PhpBrowser
     __DIR__.'/download'
 
 
+
 ### свойство proxyCheckThreads
 
 `public $proxyCheckThreads = 5;`
 
 Задает количество потоков для тестирования прокси-серверов.
 По-умолчнию равно 5.
+
 
 
 ### метод __construct()
@@ -30,13 +32,17 @@ class PhpBrowser
 Конструктор.
 
 
+
 ### метод load
 
-`public bool load(string $url[, bool $samewnd=false]);`
+`public bool load(string $url[, bool $samewnd=false[, long $timeout=0]]);`
 
 Загружает страницу по url. $samewnd определяет, будет ли
 страница загружаться в той же вкладке, или в новой. При
-удачной загрузке возвращает true, иначе false.
+удачной загрузке возвращает true, иначе false. $timeout
+задает время ожидания загрузки страницы, по-умолчанию время
+не ограничено.
+
 
 
 ### метод title
@@ -44,6 +50,7 @@ class PhpBrowser
 `public string title();`
 
 Возвращает заголовок текущей страницы.
+
 
 
 ### метод click
@@ -56,6 +63,7 @@ class PhpBrowser
 При удачной загрузке возвращает true, иначе false.
 
 
+
 ### метод elements
 
 `public array elements(string $xpath);`
@@ -63,6 +71,7 @@ class PhpBrowser
 Делает выборку элементов документа по xpath. Возвращает массив объектов
 класса PhpWebElement. Если ни одного элемента не найдено
 возвращает пустой массив.
+
 
 
 ### метод download
@@ -74,6 +83,7 @@ class PhpBrowser
 прошло успешно.
 
 
+
 ### метод back
 
 `public back();`
@@ -81,11 +91,13 @@ class PhpBrowser
 Переходит к предыдущей вкладке. Текущая вкладка закрывается.
 
 
+
 ### метод wait
 
 `public wait(int $seconds);`
 
 Ждет некоторое время, заданное в параметре $seconds.
+
 
 
 ### метод scroll
@@ -101,18 +113,16 @@ class PhpBrowser
 подгружают содержимое при достижении конца страницы. Алгоритм может
 быть следующий:
 
-```php
-$res = true;
-for ($i=0; $i<500 && $res; $i++)
-{
-    $res = $browser->scroll(1);
-    if (!$res)
+    $res = true;
+    for ($i=0; $i<500 && $res; $i++)
     {
-        $browser->wait(3);
         $res = $browser->scroll(1);
+        if (!$res)
+        {
+            $browser->wait(3);
+            $res = $browser->scroll(1);
+        }
     }
-}
-```
 
 
 ### метод fill
@@ -126,12 +136,28 @@ for ($i=0; $i<500 && $res; $i++)
 Если элемент найден возвращается true, иначе false.
 
 
+
+### метод fill2
+
+`public bool fill2(string $xpath, string $value);`
+
+Заполняет элемент input типа text или textarea значением $value
+посредством посылки ему события нажатия клавиатуры. В этом случае
+корректно срабатывают все javascript обработчики и прочее.
+Элемент выбирается по xpath. Если xpath возвращает несколько
+элементов, берется только первый.
+
+Если элемент найден возвращается true, иначе false.
+
+
+
 ### метод check
 
 `public bool check(string $xpath);`
 
 Устанавливает checkbox, заданный xpath выражением.
 Если элемент найден возвращается true, иначе false.
+
 
 
 ### метод uncheck
@@ -142,6 +168,7 @@ for ($i=0; $i<500 && $res; $i++)
 Если элемент найден возвращается true, иначе false.
 
 
+
 ### метод radio
 
 `public bool radio(string $xpath);`
@@ -149,6 +176,7 @@ for ($i=0; $i<500 && $res; $i++)
 Устанавливает элемент radio, заданный xpath выражением.
 
 Если элемент найден возвращается true, иначе false.
+
 
 
 ### метод select
@@ -161,6 +189,7 @@ c тегом option, который будет выбран.
 Если элемент найден возвращается true, иначе false.
 
 
+
 ### метод selectByText
 
 `public bool selectByText(string $xpath, string $text);`
@@ -169,6 +198,7 @@ c тегом option, который будет выбран.
 $text задает текст, который следует выбрать.
 
 Если элемент найден возвращается true, иначе false.
+
 
 
 ### метод selectByValue
@@ -182,6 +212,7 @@ $value определяет значение аттрибута value элеме
 Если элемент найден возвращается true, иначе false.
 
 
+
 ### метод fillfile
 
 `public bool fillfile(string $xpath, string $value);`
@@ -193,6 +224,7 @@ $value определяет значение аттрибута value элеме
 Если элемент найден возвращается true, иначе false.
 
 
+
 ### метод setProxyList
 
 `public int setProxyList(array $proxies[, bool ischeck=true]);`
@@ -202,12 +234,11 @@ $value определяет значение аттрибута value элеме
 тестироваться прокси. Список прокси-серверов задается массивом строк,
 каждая строка задает отдельный сервер, например
 
-```php
-$proxies = array('192.168.0.2:3128', 'user:psw@example.com:8080');
-```
+    $proxies = array('192.168.0.2:3128', 'user:psw@example.com:8080');
 
 Количество потоков для тестирования прокси-серверов задается свойством
 proxyCheckThreads.
+
 
 
 ### метод proxyList
@@ -219,11 +250,13 @@ proxyCheckThreads.
 рабочие.
 
 
+
 ### метод html
 
 `public string html();`
 
 Возвращает html текущей страницы.
+
 
 
 ### метод show
@@ -233,11 +266,13 @@ proxyCheckThreads.
 Показывает окно браузера.
 
 
+
 ### метод hide
 
 `public hide();`
 
 Скрывает окно браузера.
+
 
 
 ### метод url
@@ -247,6 +282,7 @@ proxyCheckThreads.
 Возвращает url текущей страницы браузера.
 
 
+
 ### метод requestedUrl
 
 `public string requestedUrl();`
@@ -254,11 +290,126 @@ proxyCheckThreads.
 Возвращает запрошенный url текущей страницы браузера.
 
 
+
 ### метод setHtml
 
 `public setHtml(string $html);`
 
 Устанавливает html текущей страницы.
+
+
+
+### метод setImageLoading
+
+`public setHtml(bool isloadimage);`
+
+Задает флаг - загружать ли картинки.
+
+
+
+### метод gettext
+
+`public gettext(string xpath);`
+
+Выбирает элементы по xpath и возвращает
+их текстовое содержимое.
+
+Возвращает массив строк.
+
+
+
+### метод getlink
+
+`public getlink(string xpath);`
+
+Выбирает элементы по xpath и возвращает
+их свойство href.
+
+Возвращает массив строк.
+
+
+
+### метод getimglink
+
+`public getimglink(string xpath);`
+
+Выбирает элементы по xpath и возвращает
+их свойство src.
+
+Возвращает массив строк.
+
+
+
+### метод getattr
+
+`public getattr(string xpath, string attrname);`
+
+Выбирает элементы по xpath и возвращает
+их атрибут, заданный параметром attrname.
+
+Возвращает массив строк.
+
+
+
+### метод console
+
+`public console();`
+
+Возвращает строку - содержание консольного вывода javascript.
+
+
+
+### метод clearConsole
+
+`public clearConsole();`
+
+Очищает содержание консольного вывода javascript.
+
+
+
+### метод getCookies
+
+`public getCookies();`
+
+Возвращает ассоциативный массив с названиями и значениями
+куков для текущей страницы.
+
+
+
+### метод clearCookies
+
+`public clearCookies();`
+
+Очищает все куки для всех страниц.
+
+
+
+### метод setCookiesForUrl
+
+`public setCookiesForUrl(string url, array cookies);`
+
+Устанавливает куки для заданного url. Ассоциативный массив
+cookies содержит ключи (названия куков) и значения (значения куков)
+только в текстовом виде (тип string), иначе будет ошибка.
+
+
+
+### метод getCurrentProxy
+
+`public getCurrentProxy();`
+
+Возвращает строку - текущий используемый прокси.
+
+
+
+### метод setUserAgent
+
+`public setUserAgent(string useragent);`
+
+Устанавливает UserAgent. Если нужно опять использовать
+дефолтный - передайте пустую строку.
+
+
 
 
 
@@ -273,12 +424,15 @@ class PhpWebElement
 Если аттрибут не найден возвращается пустая строка.
 
 
+
 ### метод attrAll
 
 `public array attrAll();`
 
 Возвращает ассоциативный массив имя=>значение всех аттрибутов
 элемента.
+
+
 
 ### метод tagName
 
@@ -287,12 +441,14 @@ class PhpWebElement
 Возвращает тэг элемента.
 
 
+
 ### метод prop
 
 `public string prop(string $name);`
 
 Возвращает значение свойства элемента по имени.
 Свойства элементов определяются моделью DOM документа.
+
 
 
 ### метод textAll
@@ -307,6 +463,7 @@ class PhpWebElement
 Тогда textAll() этого элемента вернет
 
     abc 123 345
+
 
 
 ### метод text
@@ -324,11 +481,13 @@ class PhpWebElement
     abc 345
 
 
+
 ### метод html
 
 `public string html();`
 
 Возвращает inner html элемента.
+
 
 
 ### метод getXPath
@@ -338,6 +497,7 @@ class PhpWebElement
 Возвращает xpath элемента.
 
 
+
 ### метод parent
 
 `public PhpWebElement parent();`
@@ -345,6 +505,7 @@ class PhpWebElement
 Возвращает родительский элемент. Если родительского
 элемента нет, то метод isNull возвращаемого элемента
 будет равен true.
+
 
  
 ### метод nextSibling
@@ -356,10 +517,9 @@ class PhpWebElement
 последний, то метод isNull возвращаемого PhpWebElement
 будет равен true.
 
-```php
-while (!$el->isNull())
-    $el = $el->nextSibling();
-```
+    while (!$el->isNull())
+        $el = $el->nextSibling();
+
 
 
 ### метод prevSibling
@@ -371,10 +531,9 @@ while (!$el->isNull())
 первый, то метод isNull возвращаемого PhpWebElement
 будет равен true.
 
-```php
-while (!$el->isNull())
-    $el = $el->prevSibling();
-```
+    while (!$el->isNull())
+        $el = $el->prevSibling();
+
 
 
 ### метод firstChild
@@ -386,6 +545,7 @@ while (!$el->isNull())
 возвращаемого элемента будет равен true.
 
 
+
 ### метод lastChild
 
 `public PhpWebElement lastChild();`
@@ -393,6 +553,7 @@ while (!$el->isNull())
 Возвращает последний дочерний элемент в списке дочерних
 элементов. Если дочерних элементов нет, то метод isNull
 возвращаемого элемента будет равен true.
+
 
 
 ### метод isNull
@@ -405,6 +566,7 @@ true если это NULL элемент, т.е. элемент отсутств
 firstChild, lastChild. 
 
 
+
 ### метод elements
 
 `public array elements(string $xpath);`
@@ -414,11 +576,10 @@ firstChild, lastChild.
 возвращается пустой массив. Например, чтобы выбрать все ссылки
 внутри элемента $el1 можно написать:
 
-```php
-$el1->elements('.//a');
-```
+    $el1->elements('.//a');
 
 Точка задает текущий контекст.
+
 
 
 ### метод click

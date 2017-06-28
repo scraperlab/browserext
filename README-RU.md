@@ -1,9 +1,8 @@
 BrowserExt - php расширение для парсинга веб-страниц и эмуляции браузера
 ========================================================================
 
-UPDATE: Ошибка с неработой в x64 исправлена. Сейчас browserext работает со 
-всеми php 5 начиная с 5.3 (php 5.3, 5.4, 5.5, 5.6) как в x32 так и в x64.
-Работает как в CLI, так и с веб-сервером. Тестировался в Ubuntu.
+UPDATE: Теперь используется Qt5.
+
 
 Возможности
 -----------
@@ -45,8 +44,6 @@ foreach ($links as $l)
 
 ### Linux (Ubuntu)
 
-Инструкции даны для Ubuntu, в другой Linux названия пакетов могут отличаться.
-
 Для работы требуется X11 Server. 
 
 На сервере без десктопа можно установить Xvfb. Для загрузки Xvfb
@@ -57,7 +54,7 @@ foreach ($links as $l)
 Для пользователя, от имени которого запускается веб-сервер,
 необходимо установить переменную окружения DISPLAY c номером сервера,
 с которым будет работать расширение. Для apache2 это можно сделать
-добавив в файл /etc/apache2/envvars следующее:
+добавив в файл envvars следующее:
 
 `export DISPLAY=:0.0`
 
@@ -65,9 +62,8 @@ foreach ($links as $l)
 
 + gcc (g++)
 + make
-+ php 5 (php5, php5-dev)
-+ Qt4 и qmake (libqt4-core, libqt4-gui, libqt4-network, libqt4-webkit,
-  qt4-qmake, libicu48, libqt4-dev)
++ php (php5, php5-dev)
++ Qt5 (qtbase5-dev, qt5-qmake, libqt5webkit5, libqt5webkit5-dev, qt5-image-formats-plugins, qt5-default)
 
 Для компиляции сделайте следующее: 
 
@@ -91,29 +87,24 @@ foreach ($links as $l)
 
 ### Windows
 
-Для Windows расширение поставляется в скомпилированном виде для php 5.3 и 5.4
+Для Windows расширение поставляется в скомпилированном виде для php 5.6
 и располагается в директории binaries\win32.
 
 Для работы расширения требуются:
 
-+ php
-+ Qt4 (QtCore4.dll, QtGui4.dll, QtNetwork4.dll, QtWebKit4.dll, image plugins)
-+ Microsoft Visual C++ 2008 Redistributable Package (x86)
++ php 5.6
++ Qt5 c QtWebKit - например Qt 5.3 или 5.4 (установите Qt5 и задайте переменную окружения QTDIR)
++ Microsoft Visual C++ 2012 Redistributable Package (x86)
 
 Для установки сделайте следующее:
 
 1.  Скопируйте php_browserext.dll, соответствующий версии php 
     в каталог с расширениями php. Например, это может быть C:\php\ext.
 
-2.  Скопируйте все dll из директории Qt в С:\windows\system32.
-
-3.  Cкопируйте директорию imageformats в директорию с exe-файлом
-    веб-сервера, например С:\apache\bin
-
-4.  Скачайте и установите Microsoft Visual C++ 2008 Redistributable
+2.  Скачайте и установите Microsoft Visual C++ 2012 Redistributable
     Package (x86).
 
-5.  В файле php.ini подключите расширение, добавив строчку
+3.  В файле php.ini подключите расширение, добавив строчку
     
     `extension=php_browserext.dll`
 
@@ -249,8 +240,3 @@ Get XPath (показывает окно инспектора xpath). Неско
 --------
 
 Данное расширение распространяется по MIT лицензии.
-
-
-Контакты
---------
-[info@scraperlab.com](mailto:info@scraperlab.com)

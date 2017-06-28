@@ -2,7 +2,7 @@
 #define PHP_BROWSEREXT_H
 
 #define PHP_BROWSEREXT_EXTNAME  "browserext"
-#define PHP_BROWSEREXT_EXTVER   "0.1"
+#define PHP_BROWSEREXT_EXTVER   "0.2"
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"

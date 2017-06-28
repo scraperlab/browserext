@@ -1,7 +1,7 @@
 #ifndef XPATHINSPECTOR_H
 #define XPATHINSPECTOR_H
 
-#include <QtGui>
+#include <QtWidgets>
 #include <QtWebKit>
 
 class PhpWebView;

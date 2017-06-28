@@ -1,10 +1,12 @@
 #include "proxycheckthread.h"
 
-ProxyCheckThread::ProxyCheckThread(const QNetworkProxy & proxy, int index)
+ProxyCheckThread::ProxyCheckThread(const QNetworkProxy & proxy, int index, const QString & site, const QString & findstr)
 {
 	this->proxy = proxy;
 	result = false;
 	this->index = index;
+	this->site = site;
+	this->findstr = findstr;
 }
 
 
@@ -12,7 +14,7 @@ void ProxyCheckThread::run()
 {
 	QNetworkAccessManager *manager = new QNetworkAccessManager();
 	manager->setProxy(proxy);
-	QNetworkRequest request = QNetworkRequest(QUrl("http://www.google.com"));
+	QNetworkRequest request = QNetworkRequest(QUrl(site));
 	request.setRawHeader("User-Agent", "Mozilla/5.0 (Windows NT 6.0; WOW64) AppleWebKit/534.27+ (KHTML, like Gecko) Version/5.0.4 Safari/533.20.27");
 	QNetworkReply *reply = manager->get(request);
 
@@ -20,7 +22,7 @@ void ProxyCheckThread::run()
 	connect(manager, SIGNAL(finished(QNetworkReply *)), &loop, SLOT(quit()));
 	loop.exec();
 	QByteArray data = reply->readAll();
-	result = data.contains("<title>Google</title>");
+	result = data.contains(findstr.toUtf8());
 	delete reply;
 	delete manager;
 }
@@ -45,12 +47,14 @@ QNetworkProxy ProxyCheckThread::getProxy()
 
 
 
-ProxyChecker::ProxyChecker(QList<QNetworkProxy> & list, int threadsNumber)
+ProxyChecker::ProxyChecker(QList<QNetworkProxy> & list, int threadsNumber, const QString & site, const QString & findstr)
 {
 	ProxyList = list;
 	this->threadsNumber = threadsNumber;
 	threadsFinishedNumber = 0;
 	ThreadsList = new QVector<ProxyCheckThread*>(threadsNumber);
+  	this->site = site;
+	this->findstr = findstr;
 }
 
 
@@ -68,7 +72,7 @@ QList<QNetworkProxy> ProxyChecker::check()
 	int i;
 	for (i=0, ProxyListIndex=0; i<threadsNumber && ProxyListIndex<ProxyList.count(); i++, ProxyListIndex++)
 	{
-		ProxyCheckThread *thread = new ProxyCheckThread(ProxyList.at(ProxyListIndex), i);
+		ProxyCheckThread *thread = new ProxyCheckThread(ProxyList.at(ProxyListIndex), i, site, findstr);
 		connect(thread, SIGNAL(finished()), this, SLOT(threadFinished()));
 		(*ThreadsList)[i] = thread;
 		//thread->start();
@@ -95,7 +99,7 @@ void ProxyChecker::threadFinished()
 
 	if (ProxyListIndex < ProxyList.count())
 	{
-		ProxyCheckThread *thread = new ProxyCheckThread(ProxyList.at(ProxyListIndex), index);
+		ProxyCheckThread *thread = new ProxyCheckThread(ProxyList.at(ProxyListIndex), index, site, findstr);
 		connect(thread, SIGNAL(finished()), this, SLOT(threadFinished()));
 		(*ThreadsList)[index] = thread;
 		thread->start();

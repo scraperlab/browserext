@@ -4,20 +4,21 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network webkit
+QT       += core network webkit widgets gui webkitwidgets
 
 TARGET = browser
 TEMPLATE = app
+CONFIG += release c++11
 
 
 SOURCES += main.cpp
 
 
-unix:!macx:!symbian: LIBS += -L$$PWD/../browserext-static/Linux_Debug/ -lphpbrowser
+unix:!macx:!symbian: LIBS += -L$$PWD/../browserext-static -lphpbrowser
 
 INCLUDEPATH += $$PWD/../browserext-static
 DEPENDPATH += $$PWD/../browserext-static
 
-unix:!macx:!symbian: PRE_TARGETDEPS += $$PWD/../browserext-static/Linux_Debug/libphpbrowser.a
+unix:!macx:!symbian: PRE_TARGETDEPS += $$PWD/../browserext-static/libphpbrowser.a
 
 

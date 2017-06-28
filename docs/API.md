@@ -31,11 +31,12 @@ Constructor.
 
 ### method load
 
-`public bool load(string $url[, bool $samewnd=false]);`
+`public bool load(string $url[, bool $samewnd=false[, long $timeout=0]]);`
 
 Loads the page by the url. $samewnd determines whether
 the page will be loaded in the same tab or in a new one. 
-If successful load returns true, otherwise false.
+If successful load returns true, otherwise false. $timeout
+specifies the page load timeout, time not limited by default.
 
 
 ### method title
@@ -97,18 +98,16 @@ it returns false.
 This method may be used for pages that dynamically loads the contents
 at the end of a page. The algorithm may be as follows:
 
-```php
-$res = true;
-for ($i=0; $i<500 && $res; $i++)
-{
-    $res = $browser->scroll(1);
-    if (!$res)
+    $res = true;
+    for ($i=0; $i<500 && $res; $i++)
     {
-        $browser->wait(3);
         $res = $browser->scroll(1);
+        if (!$res)
+        {
+            $browser->wait(3);
+            $res = $browser->scroll(1);
+        }
     }
-}
-```
 
 
 ### method fill
@@ -116,8 +115,21 @@ for ($i=0; $i<500 && $res; $i++)
 `public bool fill(string $xpath, string $value);`
 
 Fills the input element of type text or textarea with $value.
-The element is selected by xpath. If xpath returns more
-elements is taken only the first.
+The element is selected by xpath. If xpath returns multiple
+elements, only the first is taken.
+
+If the element is found returns true, otherwise false.
+
+
+### метод fill2
+
+`public bool fill2(string $xpath, string $value);`
+
+Fills the input element of type text or textarea with $value
+by sending it a keypress event. In this case all javascript handlers
+and so on work correctly. 
+The element is selected by xpath. If xpath returns multiple
+elements, only the first is taken.
 
 If the element is found returns true, otherwise false.
 
@@ -198,9 +210,7 @@ $ischeck parameter determines whether the proxies will be tested.
 Proxy server list is given an array of strings, each row identifies
 a separate server, for example
 
-```php
-$proxies = array('192.168.0.2:3128', 'user:psw@example.com:8080');
-```
+    $proxies = array('192.168.0.2:3128', 'user:psw@example.com:8080');
 
 The number of threads to test the proxy server is set by property
 proxyCheckThreads.
@@ -254,7 +264,119 @@ Returns the requested url of the current browser page.
 `public setHtml(string $html);`
 
 Sets the html of the current page.
-                                  
+
+
+### method setImageLoading
+
+`public setHtml(bool isloadimage);`
+
+Specifies the flag - whether to load pictures.
+
+
+
+### method gettext
+
+`public gettext(string xpath);`
+
+Selects elements by xpath expression and
+returns their text content.
+
+Returns array of strings.
+
+
+### method getlink
+
+`public getlink(string xpath);`
+
+Selects elements by xpath expression and
+returns their href property.
+
+Returns array of strings.
+
+
+
+### method getimglink
+
+`public getimglink(string xpath);`
+
+Selects elements by xpath expression and
+returns their src property.
+
+Returns array of strings.
+
+
+
+### method getattr
+
+`public getattr(string xpath, string attrname);`
+
+Selects elements by xpath expression and
+returns their attribute specified by the attrname parameter.
+
+Returns array of strings.
+
+
+
+### method console
+
+`public console();`
+
+Returns a string - the contents of the javascript console output.
+
+
+
+### method clearConsole
+
+`public clearConsole();`
+
+Clears the contents of the javascript console output.
+
+
+
+### method getCookies
+
+`public getCookies();`
+
+Returns an associative array with the names and values
+of the cookies for the current page.
+
+
+
+### method clearCookies
+
+`public clearCookies();`
+
+Clears all cookies for all pages.
+
+
+
+### method setCookiesForUrl
+
+`public setCookiesForUrl(string url, array cookies);`
+
+Sets cookies for the specified url. The associative array `cookies`
+contains keys (cookie names) and values (cookie values) only
+in text form (string type), otherwise there will be an error.
+
+
+
+### method getCurrentProxy
+
+`public getCurrentProxy();`
+
+Returns the string - the current used proxy.
+
+
+
+### method setUserAgent
+
+`public setUserAgent(string useragent);`
+
+Sets the UserAgent. If you want to use the default again,
+pass an empty string.                                  
+
+
+
 
 
 class PhpWebElement
@@ -350,10 +472,8 @@ returns true.
 Returns the next sibling element. If the element is last, the method isNull
 of the returning element returns true.
 
-```php
-while (!$el->isNull())
-    $el = $el->nextSibling();
-```
+    while (!$el->isNull())
+        $el = $el->nextSibling();
 
 
 ### method prevSibling
@@ -363,10 +483,8 @@ while (!$el->isNull())
 Returns the previous sibling element. If the element is first,
 the method isNull of the returning element returns true.
 
-```php
-while (!$el->isNull())
-    $el = $el->prevSibling();
-```
+    while (!$el->isNull())
+        $el = $el->prevSibling();
 
 
 ### method firstChild
@@ -405,9 +523,7 @@ an array of objects of class PhpWebElement. If the elements are not found
 returns an empty array. For example, to select all the links
 inside the $el1 you can write:
 
-```php
-$el1->elements('.//a');
-```
+    $el1->elements('.//a');
 
 The point specifies the current context.
 

@@ -99,6 +99,7 @@
 				Name="VCPostBuildEventTool"
 				Description="&#1082;&#1086;&#1087;&#1080;&#1088;&#1086;&#1074;&#1072;&#1085;&#1080;&#1077; &#1074; php-sdk"
 				CommandLine="copy $(TargetPath) &quot;C:\php-sdk\php54dev\vc9\x86\deps\lib&quot; /Y&#x0D;&#x0A;copy $(ProjectDir)phpbrowser.h &quot;C:\php-sdk\php54dev\vc9\x86\deps\include\phpbrowser&quot; /Y&#x0D;&#x0A;copy $(ProjectDir)phpbrowser.h &quot;C:\php-sdk\php54dev\vc9\x86\php-5.4.15\ext\browserext&quot; /Y&#x0D;&#x0A;copy $(TargetPath) &quot;C:\php-sdk\php53dev\vc9\x86\deps\lib&quot; /Y&#x0D;&#x0A;copy $(ProjectDir)phpbrowser.h &quot;C:\php-sdk\php53dev\vc9\x86\deps\include\phpbrowser&quot; /Y&#x0D;&#x0A;copy $(ProjectDir)phpbrowser.h &quot;C:\php-sdk\php53dev\vc9\x86\php-5.3.25\ext\browserext&quot; /Y&#x0D;&#x0A;"
+				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 		<Configuration
@@ -262,6 +263,7 @@
 				Name="VCPostBuildEventTool"
 				Description="&#1082;&#1086;&#1087;&#1080;&#1088;&#1086;&#1074;&#1072;&#1085;&#1080;&#1077; &#1074; php-sdk"
 				CommandLine="copy $(TargetPath) &quot;C:\php-sdk\php54dev\vc9\x86\deps\lib&quot; /Y&#x0D;&#x0A;copy $(ProjectDir)phpbrowser.h &quot;C:\php-sdk\php54dev\vc9\x86\deps\include\phpbrowser&quot; /Y&#x0D;&#x0A;copy $(ProjectDir)phpbrowser.h &quot;C:\php-sdk\php54dev\vc9\x86\php-5.4.15\ext\browserext&quot; /Y&#x0D;&#x0A;copy $(TargetPath) &quot;C:\php-sdk\php53dev\vc9\x86\deps\lib&quot; /Y&#x0D;&#x0A;copy $(ProjectDir)phpbrowser.h &quot;C:\php-sdk\php53dev\vc9\x86\deps\include\phpbrowser&quot; /Y&#x0D;&#x0A;copy $(ProjectDir)phpbrowser.h &quot;C:\php-sdk\php53dev\vc9\x86\php-5.3.25\ext\browserext&quot; /Y&#x0D;&#x0A;"
+				ExcludedFromBuild="true"
 			/>
 		</Configuration>
 		<Configuration
@@ -779,7 +781,7 @@
 		/>
 		<Global
 			Name="QtVersion Win32"
-			Value="4.8.4"
+			Value="4.8.6"
 		/>
 		<Global
 			Name="RccDir"

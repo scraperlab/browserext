@@ -2,6 +2,9 @@
 #include "phpbrowser.h"
 #include "proxycheckthread.h"
 #include "downloader.h"
+#include <algorithm>
+#include <random>
+#include <chrono>  
 
 
 void str_utf8_dump(const char *str)
@@ -43,7 +46,10 @@ PhpBrowser::PhpBrowser(bool canclose)
 	ProxyCheckThreads = 5;
 	currentProxy = -1;
 	isLoadImages = true;
+	isUseCache = true;
 	CookieJar = new QNetworkCookieJar(this);
+	useragent = "";
+
 	connect(tab, SIGNAL(currentChanged(int)), this, SLOT(handleTabChanged(int)));
 	connect(edit, SIGNAL(returnPressed()), this, SLOT(handleUrlChanged()));
 #if defined(Q_OS_WIN)
@@ -59,13 +65,35 @@ void PhpBrowser::newTab()
 	PhpWebView *view = new PhpWebView(this);
 	PhpWebPage *page = new PhpWebPage(view);
 
+	QWebSettings* opt = page->settings();
+
+    opt->setAttribute(QWebSettings::AutoLoadImages, true);
+    //opt->setAttribute(QWebSettings::JavascriptEnabled, true);
+    //opt->setAttribute(QWebSettings::XSSAuditingEnabled, true);
+    //opt->setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
+    opt->setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
+    //opt->setAttribute(QWebSettings::JavascriptCanCloseWindows, true);
+    //opt->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+
 	QNetworkProxy proxy;
 	if (getNextProxy(proxy))
 		page->networkAccessManager()->setProxy(proxy);
 
+	if (isUseCache)
+	{
+		QNetworkDiskCache *diskCache = new QNetworkDiskCache(page);
+		diskCache->setCacheDirectory("cacheDir");
+		page->networkAccessManager()->setCache(diskCache);
+	}
+
+    //QWebInspector *inspector = new QWebInspector(view);
+    //inspector->setPage(page);
+    //inspector->setVisible(true);
+
 	page->networkAccessManager()->setCookieJar(CookieJar);
 	CookieJar->setParent(this);
 	page->setForwardUnsupportedContent(true);
+	page->setUserAgent(useragent);
 	connect(page, SIGNAL(unsupportedContent(QNetworkReply*)), this, SLOT(startDownload(QNetworkReply*)));
 	connect(view, SIGNAL(urlChanged(const QUrl &)), this, SLOT(setEdit(const QUrl &)));
 
@@ -92,6 +120,12 @@ int PhpBrowser::load(const char* url, bool samewnd, int timeout)
 
 	if (!samewnd) newTab();
 	PhpWebView *view = getTab();
+	if (samewnd) 
+	{
+		QNetworkProxy proxy;
+		if (getNextProxy(proxy))
+			view->page()->networkAccessManager()->setProxy(proxy);
+	}
 	view->load(QUrl(qstrurl));
 
     QEventLoop loop2;
@@ -105,12 +139,14 @@ int PhpBrowser::load(const char* url, bool samewnd, int timeout)
 
 void PhpBrowser::back()
 {
-	if (tab->count() > 1)
+	if (tab->count() > 0)
 	{
-		tab->setCurrentIndex(tab->count()-2);
+		if (tab->count() > 1)
+			tab->setCurrentIndex(tab->count()-2);
 		PhpWebView *w = dynamic_cast<PhpWebView*>(tab->widget(tab->count()-1));
 		tab->removeTab(tab->count()-1);
-		delete w;
+		//delete w;
+		w->deleteLater();
 	}
 }
 
@@ -142,12 +178,15 @@ int PhpBrowser::click(const char *xpath, bool samewnd)
 
 	//std::cerr << "test: ";
 	//str_utf8_dump(getTab()->title().toUtf8().constData());
-	if ((view->isNewViewCreated || samewnd) && getTab()->viewLoadState == 0)
+	if (res != 0)
 	{
-		QEventLoop loop2;
-		QObject::connect(getTab(), SIGNAL(loadFinished(bool)), &loop2, SLOT(quit()));
-		loop2.exec();
-		res = getTab()->loadError;
+		if ((view->isNewViewCreated || samewnd) && getTab()->viewLoadState == 0)
+		{
+			QEventLoop loop2;
+			QObject::connect(getTab(), SIGNAL(loadFinished(bool)), &loop2, SLOT(quit()));
+			loop2.exec();
+			res = getTab()->loadError;
+		}
 	}
 	return res;
 }
@@ -159,23 +198,26 @@ int PhpBrowser::click2(WebElementTS *elem, bool samewnd)
 	PhpWebView *view = dynamic_cast<PhpWebView*>(elem2.webFrame()->page()->view());
 	int res = view->click2(elem2, samewnd);
 
-	if (view->isNewViewCreated || samewnd)
-    {
-		if (!samewnd && getTab()->viewLoadState == 0)
+	if (res != 0)
+	{
+		if (view->isNewViewCreated || samewnd)
 		{
-			QEventLoop loop2;
-			QObject::connect(getTab(), SIGNAL(loadFinished(bool)), &loop2, SLOT(quit()));
-			loop2.exec();
-			res = getTab()->loadError;
+			if (!samewnd && getTab()->viewLoadState == 0)
+			{
+				QEventLoop loop2;
+				QObject::connect(getTab(), SIGNAL(loadFinished(bool)), &loop2, SLOT(quit()));
+				loop2.exec();
+				res = getTab()->loadError;
+			}
+			else if (samewnd && view->viewLoadState == 0)
+			{
+				QEventLoop loop2;
+				QObject::connect(view, SIGNAL(loadFinished(bool)), &loop2, SLOT(quit()));
+				loop2.exec();
+				res = view->loadError;
+			}
 		}
-		else if (samewnd && view->viewLoadState == 0)
-		{
-			QEventLoop loop2;
-			QObject::connect(view, SIGNAL(loadFinished(bool)), &loop2, SLOT(quit()));
-			loop2.exec();
-			res = view->loadError;
-		}
-    }
+	}
 	return res;
 }
 
@@ -200,6 +242,22 @@ int PhpBrowser::fill(const char *xpath, const char *value)
 		return 1;
 	}
 	return 0;
+}
+
+
+
+int PhpBrowser::fill2(const char *xpath, const char *value)
+{
+	if (!getTab()) return 0;
+
+	QWebElement elem = getTab()->getElementByXPath(QString(xpath));
+	//std::cerr << "fill: " << elem.tagName().toLower().toUtf8().constData() << " " << elem.attribute("type").toUtf8().constData() << std::endl;
+	
+	//elem.setFocus();
+	elem.evaluateJavaScript("this.focus()");
+	QString text(value);
+	sendEvent("keypress", QVariant(text));
+	return 1;
 }
 
 
@@ -332,6 +390,56 @@ QStringList PhpBrowser::getimglink(const char *xpath)
 	}
 	return ret;
 }
+
+
+QStringList PhpBrowser::gettext(const char *xpath)
+{
+	if (!getTab()) return QStringList();
+	QList<QWebElement> list = getTab()->getAllElementsByXPath(QString(xpath));
+
+	QStringList ret;
+	for (int i=0; i<list.count(); i++)
+	{
+		QWebElement elem = list[i];
+		QString str = elem.toPlainText();
+		ret.append(str);
+	}
+	return ret;
+}
+
+
+
+QStringList PhpBrowser::getlink(const char *xpath)
+{
+	if (!getTab()) return QStringList();
+	QList<QWebElement> list = getTab()->getAllElementsByXPath(QString(xpath));
+
+	QStringList ret;
+	for (int i=0; i<list.count(); i++)
+	{
+		QWebElement elem = list[i];
+		QString str = elem.evaluateJavaScript("this.href").toString();
+		ret.append(str);
+	}
+	return ret;
+}
+
+
+QStringList PhpBrowser::getattr(const char *xpath, const char *attr)
+{
+	if (!getTab()) return QStringList();
+	QList<QWebElement> list = getTab()->getAllElementsByXPath(QString(xpath));
+
+	QStringList ret;
+	for (int i=0; i<list.count(); i++)
+	{
+		QWebElement elem = list[i];
+		QString str = elem.evaluateJavaScript("this.getAttribute('"+QString(attr)+"')").toString();
+		ret.append(str);
+	}
+	return ret;
+}
+
 
 
 QList<WebElementTS*> PhpBrowser::getelements(const char *xpath)
@@ -468,6 +576,13 @@ char *PhpBrowser::console()
 }
 
 
+void PhpBrowser::clearConsole()
+{
+	if (getTab())
+		getTab()->clearConsole();
+}
+
+
 void PhpBrowser::wait(int seconds)
 {
 	if (seconds > 0)
@@ -511,7 +626,7 @@ int PhpBrowser::scroll(int numscreen)
 }
 
 
-int PhpBrowser::setproxylist(QStringList & strlist, bool ischeck)
+int PhpBrowser::setproxylist(QStringList & strlist, bool ischeck, QString site, QString findstr)
 {
 	ProxyList.clear();
 	for (int i=0; i<strlist.count(); i++)
@@ -535,9 +650,12 @@ int PhpBrowser::setproxylist(QStringList & strlist, bool ischeck)
 		}
 	}
 
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+	std::shuffle<QList<QNetworkProxy>::iterator>(ProxyList.begin(), ProxyList.end(), std::default_random_engine(seed));
+
 	if (ischeck)
 	{
-		ProxyChecker *checker = new ProxyChecker(ProxyList, ProxyCheckThreads);
+		ProxyChecker *checker = new ProxyChecker(ProxyList, ProxyCheckThreads, site, findstr);
 		ProxyList = checker->check();
 		delete checker;
 	}
@@ -578,7 +696,11 @@ bool PhpBrowser::getNextProxy(QNetworkProxy & proxy)
 	if (ProxyList.count() > 0)
 	{
 		if (++currentProxy >= ProxyList.count())
+		{
+			unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+			std::shuffle<QList<QNetworkProxy>::iterator>(ProxyList.begin(), ProxyList.end(), std::default_random_engine(seed));
 			currentProxy = 0;
+		}
 		proxy = ProxyList.at(currentProxy);
 		return true;
 	}
@@ -721,4 +843,289 @@ int PhpBrowser::jsexec(WebElementTS *elem, const char *js)
 	QWebElement elem2 = elem->getElement();
 	elem2.evaluateJavaScript(QString(js));
 	return 1;
+}
+
+
+int PhpBrowser::submitform(const char *xpath, QMapParams params, bool samewnd, QString action2, QString method, int timeout, bool nobrowser, QString wrapper)
+{
+	if (!getTab()) return 0;
+	QList<QWebElement> list = getTab()->getAllElementsByXPath(QString(xpath));
+
+	if (list.count() > 0)
+	{
+		WebElementTS *elts = new WebElementTS(list[0]);
+		QList<WebElementTS*> input = this->getelements2(".//input[@type=\"text\"]|.//input[@type=\"hidden\"]|.//input[@type=\"password\"]|.//input[@type=\"checkbox\"][@checked]|.//select|.//textarea", elts);
+		QByteArray body;
+		for (int i=0; i<input.count(); i++)
+		{
+			QString name = input[i]->prop("name");
+			QString val = input[i]->prop("value");
+			if (i>0) body += "&";
+			if (name != "" && !params.contains(name))
+				body += QUrl::toPercentEncoding(name)+"="+QUrl::toPercentEncoding(val);
+		}
+
+		QMapIterator<QString, QString> ii(params);
+		while (ii.hasNext()) {
+			ii.next();
+			QString name = ii.key();
+			QString val = ii.value();
+			if (!body.isEmpty()) body += "&";
+			body += QUrl::toPercentEncoding(name)+"="+QUrl::toPercentEncoding(val);
+		}
+
+		QString url = (action2 != "") ? action2 : elts->prop("action");
+		
+		PhpWebView *view = getTab();
+		
+		QNetworkRequest request;
+		if (method == "GET" && body != "")
+		{
+			if (url.contains("?")) url += "&"+body;
+			else url += "?"+body;
+		}
+		request.setUrl(QUrl(url));
+		QList<QNetworkCookie> cookies = view->page()->networkAccessManager()->cookieJar()->cookiesForUrl(view->page()->mainFrame()->url().toString());
+		QVariant varParams;
+		varParams.setValue<QList<QNetworkCookie>>(cookies);
+		request.setHeader(QNetworkRequest::CookieHeader, varParams);
+		QString prevurl = view->page()->mainFrame()->url().toString();
+		request.setRawHeader("Referer", prevurl.toUtf8());
+		request.setRawHeader("X-Requested-With", "XMLHttpRequest");
+
+		if (!samewnd)
+		{
+			newTab();
+			view = getTab();
+		}
+
+		if (nobrowser)
+		{
+			QNetworkAccessManager *manager = new QNetworkAccessManager();
+			QNetworkProxy proxy;
+			if (getNextProxy(proxy))
+				manager->setProxy(proxy);
+			connect(manager, SIGNAL(sslErrors(QNetworkReply*, const QList<QSslError> & )), this, SLOT(handleSslErrors(QNetworkReply*, const QList<QSslError> & )));
+
+			QNetworkReply *repl;
+			if (method == "POST")
+				repl = manager->post(request, body);
+			else
+				repl = manager->get(request);
+						
+			QEventLoop loop2;
+			QObject::connect(repl, SIGNAL(finished()), &loop2, SLOT(quit()));
+			if (timeout > 0)
+				QTimer::singleShot(timeout*1000, &loop2, SLOT(quit()));
+			loop2.exec();
+
+			QString result = repl->readAll();
+			QString result2 = wrapper.replace("{%content%}", result);
+
+			view->page()->mainFrame()->setHtml(result2, QUrl(url));
+
+			delete manager;
+		}
+		else
+		{
+			QNetworkProxy proxy;
+			if (getNextProxy(proxy))
+				view->page()->networkAccessManager()->setProxy(proxy);
+				
+			if (method == "POST")
+				view->load(request, QNetworkAccessManager::PostOperation, body);
+			else
+				view->load(request, QNetworkAccessManager::GetOperation);
+				
+			QEventLoop loop2;
+			QObject::connect(view, SIGNAL(loadFinished(bool)), &loop2, SLOT(quit()));
+			if (timeout > 0)
+				QTimer::singleShot(timeout*1000, &loop2, SLOT(quit()));
+			loop2.exec();
+		}
+		return 1;
+	}
+	else
+		return 0;
+}
+
+
+void PhpBrowser::handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors)
+{
+    qDebug() << "handleSslErrors: ";
+    foreach (QSslError e, errors)
+    {
+        qDebug() << "ssl error: " << e;
+    }
+
+    reply->ignoreSslErrors();
+}
+
+
+QMapParams PhpBrowser::getCookies()
+{
+	PhpWebView *view = getTab();
+	QList<QNetworkCookie> cookies = view->page()->networkAccessManager()->cookieJar()->cookiesForUrl(view->page()->mainFrame()->url().toString());
+	QMapParams ret;
+	for (int i=0; i<cookies.count(); i++)
+	{
+		ret[cookies[i].name()] = cookies[i].value();
+	}
+	return ret;
+}
+
+
+void PhpBrowser::clearCookies()
+{
+	PhpWebView *view = getTab();
+	view->page()->networkAccessManager()->setCookieJar(new QNetworkCookieJar());
+}
+
+
+QString PhpBrowser::getCurrentProxy()
+{
+	PhpWebView *view = getTab();
+	QNetworkProxy proxy = view->page()->networkAccessManager()->proxy();
+	QString ret = proxy.user()!="" ? proxy.user()+":"+proxy.password() : "";
+	ret += proxy.hostName()+":"+proxy.port();
+	return ret;
+}
+
+
+char* PhpBrowser::getCurrentProxy2()
+{
+	return strdup_qstring(getCurrentProxy());
+}
+
+
+void PhpBrowser::sendEvent(const QString& type, const QVariant& arg1, const QVariant& arg2, const QString& mouseButton, const QVariant& modifierArg)
+{
+    Qt::KeyboardModifiers keyboardModifiers(modifierArg.toInt());
+    // Normalize the event "type" to lowercase
+    const QString eventType = type.toLower();
+
+    // single keyboard events
+    if (eventType == "keydown" || eventType == "keyup") {
+        QKeyEvent::Type keyEventType = QEvent::None;
+        if (eventType == "keydown") {
+            keyEventType = QKeyEvent::KeyPress;
+        }
+        if (eventType == "keyup") {
+            keyEventType = QKeyEvent::KeyRelease;
+        }
+        Q_ASSERT(keyEventType != QEvent::None);
+
+        int key = 0;
+        QString text;
+        if (arg1.type() == QVariant::Char) {
+            // a single char was given
+            text = arg1.toChar();
+            key = text.at(0).toUpper().unicode();
+        } else if (arg1.type() == QVariant::String) {
+            // javascript invokation of a single char
+            text = arg1.toString();
+            if (!text.isEmpty()) {
+                key = text.at(0).toUpper().unicode();
+            }
+        } else {
+            // assume a raw integer char code was given
+            key = arg1.toInt();
+        }
+        QKeyEvent* keyEvent = new QKeyEvent(keyEventType, key, keyboardModifiers, text);
+        QApplication::postEvent(getTab()->page(), keyEvent);
+        QApplication::processEvents();
+        return;
+    }
+
+    // sequence of key events: will generate all the single keydown/keyup events
+    if (eventType == "keypress") {
+        if (arg1.type() == QVariant::String) {
+            // this is the case for e.g. sendEvent("...", 'A')
+            // but also works with sendEvent("...", "ABCD")
+            foreach(const QChar typeChar, arg1.toString()) {
+                sendEvent("keydown", typeChar, QVariant(), QString(), modifierArg);
+                sendEvent("keyup", typeChar, QVariant(), QString(), modifierArg);
+            }
+        } else {
+            // otherwise we assume a raw integer char-code was given
+            sendEvent("keydown", arg1.toInt(), QVariant(), QString(), modifierArg);
+            sendEvent("keyup", arg1.toInt(), QVariant(), QString(), modifierArg);
+        }
+        return;
+    }
+
+    // mouse events
+    if (eventType == "mousedown" ||
+            eventType == "mouseup" ||
+            eventType == "mousemove" ||
+            eventType == "mousedoubleclick") {
+        QMouseEvent::Type mouseEventType = QEvent::None;
+
+        // Which mouse button (if it's a click)
+        Qt::MouseButton button = Qt::LeftButton;
+        Qt::MouseButton buttons = Qt::LeftButton;
+        if (mouseButton.toLower() == "middle") {
+            button = Qt::MiddleButton;
+            buttons = Qt::MiddleButton;
+        } else if (mouseButton.toLower() == "right") {
+            button = Qt::RightButton;
+            buttons = Qt::RightButton;
+        }
+
+        // Which mouse event
+        if (eventType == "mousedown") {
+            mouseEventType = QEvent::MouseButtonPress;
+        } else if (eventType == "mouseup") {
+            mouseEventType = QEvent::MouseButtonRelease;
+        } else if (eventType == "mousedoubleclick") {
+            mouseEventType = QEvent::MouseButtonDblClick;
+        } else if (eventType == "mousemove") {
+            mouseEventType = QEvent::MouseMove;
+            button = Qt::NoButton;
+            buttons = Qt::NoButton;
+        }
+        Q_ASSERT(mouseEventType != QEvent::None);
+
+		QPoint m_mousePos;
+        // Gather coordinates
+        if (arg1.isValid() && arg2.isValid()) {
+            m_mousePos.setX(arg1.toInt());
+            m_mousePos.setY(arg2.toInt());
+        }
+
+        // Prepare the Mouse event
+        qDebug() << "Mouse Event:" << eventType << "(" << mouseEventType << ")" << m_mousePos << ")" << button << buttons;
+        QMouseEvent* event = new QMouseEvent(mouseEventType, m_mousePos, button, buttons, keyboardModifiers);
+
+        // Post and process events
+		QApplication::postEvent(getTab()->page(), event);
+        QApplication::processEvents();
+        return;
+    }
+}
+
+
+void PhpBrowser::setUserAgent(const char *ua)
+{
+	useragent = QString::fromUtf8(ua);
+	PhpWebView *view = getTab();
+	if (view != NULL)
+		view->setUserAgent(useragent);
+}
+
+
+void PhpBrowser::setCookiesForUrl(const char* url, QMapParams & qmap)
+{
+	QList<QNetworkCookie> cookieList;
+	QMapParams::iterator i;
+	for (i = qmap.begin(); i != qmap.end(); ++i)
+	{
+		QString name = i.key();
+		QString val = i.value();
+		QNetworkCookie cookie1(name.toUtf8(), val.toUtf8());
+		cookie1.setPath("/");
+		cookie1.setExpirationDate(QDateTime::currentDateTime().addYears(1));
+		cookieList.append(cookie1);
+	}
+	CookieJar->setCookiesFromUrl(cookieList, QUrl(QString(url)));
 }

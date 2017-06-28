@@ -4,11 +4,11 @@
 #
 #-------------------------------------------------
 
-QT       += network webkit
+QT       += core network webkit widgets gui webkitwidgets
 
 TARGET = phpbrowser
 TEMPLATE = lib
-CONFIG += staticlib
+CONFIG += staticlib release c++11
 
 SOURCES += downloader.cpp \
     guithread.cpp \
@@ -24,15 +24,5 @@ SOURCES += downloader.cpp \
 
 HEADERS += phpbrowser.h \
     downloader.h \
-    phpwebpage.h \
     proxycheckthread.h \
     xpathinspector.h
-
-unix:!symbian {
-    maemo5 {
-        target.path = /opt/usr/lib
-    } else {
-        target.path = /usr/lib
-    }
-    INSTALLS += target
-}

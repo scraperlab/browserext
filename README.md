@@ -1,8 +1,8 @@
 BrowserExt - php extension for web scraping and browser emulation
 =================================================================
 
-UPDATE: Now works in all php5 since 5.3 (php 5.3, 5.4, 5.5, 5.6) both 
-x32 and x64. It works with CLI and web server. Tested in Ubuntu.
+LAST UPDATE: Upgrading to Qt5.
+
 
 Features
 --------
@@ -42,8 +42,6 @@ Installation
 
 ### Linux (Ubuntu)
 
-There are instructions for Ubuntu, in other Linux packages may vary.
-
 It requires X11 Server. On the server without desktop you must use Xvfb.
 For loading Xvfb at system startup add this line to /etc/rc.local:
 
@@ -52,7 +50,7 @@ For loading Xvfb at system startup add this line to /etc/rc.local:
 For user, from which web server is running, you must set 
 the environment variable DISPLAY with server number with which
 the extension will work. For apache2 this can be done by adding
-this line to /etc/apache2/envvars file:
+this line to envvars file:
 
 `export DISPLAY=:0.0`
 
@@ -61,9 +59,8 @@ The extension requires compilation in Linux. This requires:
 
 + gcc (g++)
 + make
-+ php 5 (php5, php5-dev)
-+ Qt4 (libqt4-core, libqt4-gui, libqt4-network, libqt4-webkit,
-  qt4-qmake, libicu48, libqt4-dev)
++ php (php5, php5-dev)
++ Qt5 (qtbase5-dev, qt5-qmake, libqt5webkit5, libqt5webkit5-dev, qt5-image-formats-plugins, qt5-default)
 
 Follow these steps:
 
@@ -86,29 +83,24 @@ Follow these steps:
 
 ### Windows
 
-For Windows the extension comes with binaries for php 5.3 and 5.4
+For Windows the extension comes with binaries for php 5.6
 and is located in the directory `binaries\win32`.
 
 For extension work required:
 
-+ php
-+ Qt4 (QtCore4.dll, QtGui4.dll, QtNetwork4.dll, QtWebKit4.dll)
-+ Microsoft Visual C++ 2008 Redistributable Package (x86)
++ php 5.6
++ Qt5 with QtWebKit - Qt 5.4 or 5.3 for example (install Qt5 and set QTDIR environment variable)
++ Microsoft Visual C++ 2012 Redistributable Package (x86)
 
 To install, do the following:
 
 1.  Copy php_browserext.dll, the appropriate version of php 
     in the extensions directory. For example, it may be C:\php\ext.
 
-2.  Copy all dll's from Qt directory to С:\windows\system32.
-
-3.  Copy imageformats directory to directory with executable file
-    of your web server, for example С:\apache\bin
-
-4.  Download and install Microsoft Visual C++ 2008 Redistributable
+2.  Download and install Microsoft Visual C++ 2012 Redistributable
     Package (x86).
 
-5.  In the php.ini file, enable the extension by adding the line
+3.  In the php.ini file, enable the extension by adding the line
     
     `extension=php_browserext.dll`
 
@@ -242,7 +234,3 @@ License
 
 BrowserExt is licensed under the MIT license.
 
-
-Contacts
---------
-[info@scraperlab.com](mailto:info@scraperlab.com)

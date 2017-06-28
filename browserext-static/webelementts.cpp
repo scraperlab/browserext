@@ -20,7 +20,8 @@ QWebElement WebElementTS::getElement()
 
 char *WebElementTS::attribute(const char *name)
 {
-	QString attr = element.attribute(QString(name));
+	QString qname = name;
+	QString attr = element.attribute(qname);
 	char *ret = strdup_qstring(attr);
 	return ret;
 }

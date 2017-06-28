@@ -3,12 +3,15 @@
 
 /* Header file from browserext-static library */
 
-#include <QtGui>
+#include <QtWidgets>
 #include <QtWebKit>
+#include <QtWebKitWidgets/QtWebKitWidgets>
 #include <QtNetwork>
 #include <QWaitCondition>
 #include <QMutex>
 
+
+typedef QMap<QString,QString> QMapParams;
 
 class PhpBrowser;
 class XPathInspector;
@@ -21,10 +24,15 @@ class PhpWebPage : public QWebPage
 public:
 	PhpWebPage(QObject * parent = 0);
 	QString console();
+	void clearConsole();
 	void addToConsole(const QString & str);
 	void setLastScroll(QPoint & point);
 	QPoint lastScroll();
 	void setFilename(const QString & filename);
+	void setUserAgent(const QString & ua);
+
+protected Q_SLOTS:
+	void handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
 
 protected:
 	virtual void javaScriptAlert(QWebFrame * frame, const QString & msg); 
@@ -33,10 +41,12 @@ protected:
 	virtual bool javaScriptPrompt(QWebFrame * frame, const QString & msg, const QString & defaultValue, QString * result);
 	virtual bool acceptNavigationRequest(QWebFrame * frame, const QNetworkRequest & request, NavigationType type);
 	virtual QString chooseFile(QWebFrame *parentFrame, const QString & suggestedFile);
+	virtual QString userAgentForUrl(const QUrl & url) const;
 
 	QString output;
 	QPoint last_scroll;
 	QString filename;
+	QString useragent;
 };
 
 
@@ -96,6 +106,8 @@ public:
     QWebElement getElementByCoord(QWebElement root, QPoint point);
 	void selectElement(QWebElement & elem, bool setselect = true);
 	QString console();
+	void clearConsole();
+	void setUserAgent(const QString & ua);
 
 	friend class PhpWebPage;
 	friend class PhpBrowser;
@@ -158,6 +170,7 @@ public Q_SLOTS:
 	int click(const char* xpath, bool samewnd = false);
 	int click2(WebElementTS *elem, bool samewnd = false);
 	int fill(const char *xpath, const char *value);
+	int fill2(const char *xpath, const char *value);
 	int check(const char *xpath);
 	int uncheck(const char *xpath);
 	int radio(const char *xpath);
@@ -167,12 +180,16 @@ public Q_SLOTS:
 	int fillfile(const char *xpath, const char *filename);
 	int download(const char *link, const char *dest);
 	QStringList getimglink(const char *xpath);
+	QStringList gettext(const char *xpath);
+	QStringList getlink(const char *xpath);
+	QStringList getattr(const char *xpath, const char *attr);
 	QList<WebElementTS*> getelements(const char *xpath);
 	QList<WebElementTS*> getelements2(const char *xpath, WebElementTS *node);
 	char *console();
+	void clearConsole();
 	void wait(int seconds);
 	int scroll(int numscreen);
-	int setproxylist(QStringList & strlist, bool ischeck = true);
+	int setproxylist(QStringList & strlist, bool ischeck = true, QString site = "http://www.google.com", QString findstr = "google");
 	QStringList proxylist();
 	char *html();
 	char *url();
@@ -182,12 +199,21 @@ public Q_SLOTS:
 	void setHtml(const char *html, const char *url = "");
 	void setImageLoading(bool isload);
 	int jsexec(WebElementTS *elem, const char *js);
+	int submitform(const char *xpath, QMapParams params, bool samewnd = false, QString action2 = "", QString method = "POST", int timeout = 20, bool nobrowser = false, QString wrapper = "{%content%}");
+	QMapParams getCookies();
+	void clearCookies();
+	QString getCurrentProxy();
+	char *getCurrentProxy2();
+	void sendEvent(const QString& type, const QVariant& arg1 = QVariant(), const QVariant& arg2 = QVariant(), const QString& mouseButton = QString(), const QVariant& modifierArg = QVariant());
+	void setUserAgent(const char *ua);
+	void setCookiesForUrl(const char* url, QMapParams & qmap);
 
 protected Q_SLOTS:
 	void setEdit(const QUrl & url);
 	void handleTabChanged(int index);
 	void handleUrlChanged();
 	void startDownload(QNetworkReply *reply);
+	void handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
 
 protected:
 	void newTab();
@@ -207,13 +233,18 @@ protected:
 	QLineEdit *edit;
 	QBoxLayout *layout;
 	QList<QNetworkProxy> ProxyList;
+public:
 	QNetworkCookieJar *CookieJar;
+	QNetworkDiskCache *diskCache;
+protected:
 	int currentProxy;
 	bool canclose;
 	bool isLoadImages;
+	QString useragent;
 public:
 	int ProxyCheckThreads;
 	QString downloadDirectory;
+	bool isUseCache;
 };
 
 

@@ -31,14 +31,16 @@ PhpWebView::PhpWebView(PhpBrowser *browser, QWidget *parent)
 int PhpWebView::click(const QString & xpath, bool samewnd)
 {
 	QWebElement elem = getElementByXPath(QString(xpath));
-
+	
 	if (elem.isNull())
 		return 0;
+
+	elem.setFocus();
 
 	if (samewnd)
 		elem.removeAttribute("target");
 
-	/*QString js = "var node = this; var x = node.offsetLeft; var y = node.offsetTop; ";
+	QString js = "var node = this; var x = node.offsetLeft; var y = node.offsetTop; ";
 	js += "var w = node.offsetWidth/2; ";
 	js += "var h = node.offsetHeight/2; ";
 	js += "while (node.offsetParent != null) { ";
@@ -50,12 +52,12 @@ int PhpWebView::click(const QString & xpath, bool samewnd)
 	QList<QVariant> vlist = elem.evaluateJavaScript(js).toList();
 	QPoint point;
 	point.setX(vlist.at(0).toInt());
-	point.setY(vlist.at(1).toInt());*/
+	point.setY(vlist.at(1).toInt());
 
 	QRect elGeom = elem.geometry();
 	QPoint elPoint = elGeom.center();
-	int elX = elPoint.x();
-	int elY = elPoint.y();
+	int elX = point.x(); //elPoint.x();
+	int elY = point.y(); //elPoint.y();
 	int webWidth = width();
 	int webHeight = height();
 	int pixelsToScrollRight=0;
@@ -88,16 +90,19 @@ int PhpWebView::click(const QString & xpath, bool samewnd)
 	isNewViewCreated = false;
 	isNewViewBegin = false;
 	
-	/*QMouseEvent pressEvent(QMouseEvent::MouseButtonPress, pointToClick, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
-	QApplication::sendEvent(browser, &pressEvent);
-	QMouseEvent releaseEvent(QMouseEvent::MouseButtonRelease,pointToClick,Qt::LeftButton,Qt::LeftButton,Qt::NoModifier);
-	QApplication::sendEvent(browser, &releaseEvent);*/
+	//QMouseEvent *pressEvent = new QMouseEvent(QMouseEvent::MouseButtonPress, pointToClick, Qt::LeftButton, Qt::LeftButton, Qt::NoModifier);
+	//QApplication::postEvent(browser, pressEvent);
+	//QApplication::processEvents();
 
-	QString js = "var e = document.createEvent('MouseEvents');";
-    //js += "e.initEvent( 'click', true, true );";
-	js += "e.initMouseEvent( 'click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);";
-    js += "this.dispatchEvent(e);";
-	elem.evaluateJavaScript(js);
+	//QMouseEvent releaseEvent(QMouseEvent::MouseButtonRelease,pointToClick,Qt::LeftButton,Qt::LeftButton,Qt::NoModifier);
+	//QApplication::sendEvent(browser, &releaseEvent);
+
+	QString js2 = "var e = document.createEvent('MouseEvents');";
+    //js2 += "e.initEvent( 'click', true, true );";
+	//js2 += "e.initMouseEvent('click', true, true, window, 0, 0, 0, "+QString::number(elX)+", "+QString::number(elY)+", false, false, false, false, 0, null);";
+	js2 += "e.initMouseEvent('click', true, true, window, 0, 0, 0, 0, 0, false, false, false, false, 0, null);";
+    js2 += "this.dispatchEvent(e);";
+	elem.evaluateJavaScript(js2);
 	
 	QTimer::singleShot(1000, &loop, SLOT(quit()));
 	loop.exec();
@@ -387,6 +392,18 @@ QString PhpWebView::console()
 }
 
 
+void PhpWebView::clearConsole()
+{
+	dynamic_cast<PhpWebPage*>(page())->clearConsole();
+}
+
+
+void PhpWebView::setUserAgent(const QString & ua)
+{
+	dynamic_cast<PhpWebPage*>(page())->setUserAgent(ua);
+}
+
+
 void PhpWebView::setPage(PhpWebPage *page)
 {
 	//network->setCookieJar(page->networkAccessManager()->cookieJar());
@@ -398,6 +415,20 @@ void PhpWebView::setPage(PhpWebPage *page)
 void PhpWebView::requestFinished(QNetworkReply *reply)
 {
 	//std::cerr << "request finished" << std::endl;
+	QString url = reply->request().url().toString();
+	QString url2 = page()->mainFrame()->url().toString();
+	if (url == url2)
+	{
+		switch (reply->error())
+		{
+			case QNetworkReply::NoError:
+				return;
+			default:
+				QString status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toString();
+				QString url = reply->request().url().toString();
+				page()->mainFrame()->setHtml("<html><body><p>"+url+"</p><p style=\"font-size:20pt\">Status: "+status+"</p></body></html>");
+		}
+	}
 }
 
 
@@ -457,3 +488,4 @@ void PhpWebView::handleLoadStarted()
 {
 	viewLoadState = 0;
 }
+

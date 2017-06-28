@@ -1,0 +1,8 @@
+QT5 packages in Ubuntu (Debian):
+
+qtbase5-dev
+qt5-qmake
+libqt5webkit5
+libqt5webkit5-dev
+qt5-image-formats-plugins
+qt5-default

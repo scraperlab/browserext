@@ -203,19 +203,21 @@ PHP_METHOD(PhpBrowser, load)
     int url_len;
     int res;
     zend_bool zsamewnd = 0;
+	long timeout = 0;
 
     phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
     browser = obj->browser;
         
-    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|b",
-                        &url, &url_len, &zsamewnd) == FAILURE) {
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s|bl",
+                        &url, &url_len, &zsamewnd, &timeout) == FAILURE) {
         RETURN_LONG(0);
     }
 
     if (browser != NULL) {
         Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
         bool samewnd = zsamewnd != 0;
-        QMetaObject::invokeMethod(browser, "load", ct, Q_RETURN_ARG(int, res), Q_ARG(const char*, url), Q_ARG(bool, samewnd));
+		int timeoutint = timeout;
+        QMetaObject::invokeMethod(browser, "load", ct, Q_RETURN_ARG(int, res), Q_ARG(const char*, url), Q_ARG(bool, samewnd), Q_ARG(int, timeoutint));
         if (res != 0) {
             RETURN_TRUE;
         }
@@ -374,7 +376,7 @@ PHP_METHOD(PhpBrowser, back)
 PHP_METHOD(PhpBrowser, wait)
 {
     PhpBrowser *browser = NULL;
-    int sec = 0;
+    long sec = 0;
 
     phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
     browser = obj->browser;
@@ -385,7 +387,8 @@ PHP_METHOD(PhpBrowser, wait)
 
     if (browser != NULL) {
         Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
-        QMetaObject::invokeMethod(browser, "wait", ct, Q_ARG(int, sec));
+		int secint = sec;
+        QMetaObject::invokeMethod(browser, "wait", ct, Q_ARG(int, secint));
         RETURN_TRUE;
     }
     else {
@@ -397,7 +400,7 @@ PHP_METHOD(PhpBrowser, wait)
 PHP_METHOD(PhpBrowser, scroll)
 {
     PhpBrowser *browser = NULL;
-    int screen = 0;
+    long screen = 0;
     int ret = 0;
 
     phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
@@ -409,7 +412,8 @@ PHP_METHOD(PhpBrowser, scroll)
 
     if (browser != NULL) {
         Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
-        QMetaObject::invokeMethod(browser, "scroll", ct, Q_RETURN_ARG(int, ret), Q_ARG(int, screen));
+		int screenint = screen;
+        QMetaObject::invokeMethod(browser, "scroll", ct, Q_RETURN_ARG(int, ret), Q_ARG(int, screenint));
         if (ret != 0) {
             RETURN_TRUE;
         }
@@ -443,6 +447,39 @@ PHP_METHOD(PhpBrowser, fill)
     if (browser != NULL) {
         Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
         QMetaObject::invokeMethod(browser, "fill", ct, Q_RETURN_ARG(int, res), Q_ARG(const char*, str), Q_ARG(const char*, str2));
+        if (res != 0) {
+            RETURN_TRUE;
+        }
+        else {
+            RETURN_FALSE;
+        }
+    }
+    else {
+        RETURN_NULL();
+    }
+}
+
+
+PHP_METHOD(PhpBrowser, fill2)
+{
+    PhpBrowser *browser;
+    char *str;
+    int str_len;
+    char *str2;
+    int str_len2;
+    int res;
+
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
+    browser = obj->browser;
+        
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss",
+                        &str, &str_len, &str2, &str_len2) == FAILURE) {
+        RETURN_NULL();
+    }
+        
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "fill2", ct, Q_RETURN_ARG(int, res), Q_ARG(const char*, str), Q_ARG(const char*, str2));
         if (res != 0) {
             RETURN_TRUE;
         }
@@ -903,6 +940,354 @@ PHP_METHOD(PhpBrowser, setImageLoading)
         RETURN_NULL();
     }
 }
+
+
+
+PHP_METHOD(PhpBrowser, gettext)
+{
+    zval *zobj;
+    PhpBrowser *browser;
+    QStringList qlist;
+	char *str;
+    int str_len;
+    zval *zelem;
+
+    zobj = getThis();
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(zobj TSRMLS_CC);
+    browser = obj->browser;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s",
+                        &str, &str_len) == FAILURE) {
+        RETURN_NULL();
+    }
+
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "gettext", ct, Q_RETURN_ARG(QStringList, qlist), Q_ARG(const char*, str));
+
+        array_init(return_value);
+
+        for (int i=0; i<qlist.count(); i++)
+        {
+            char *str = strdup_qstring(qlist.at(i));
+            add_next_index_string(return_value, str, 1);
+            delete str;
+        }
+    }
+    else {
+        RETURN_FALSE;
+    }
+}
+
+
+PHP_METHOD(PhpBrowser, getlink)
+{
+    zval *zobj;
+    PhpBrowser *browser;
+    QStringList qlist;
+	char *str;
+    int str_len;
+    zval *zelem;
+
+    zobj = getThis();
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(zobj TSRMLS_CC);
+    browser = obj->browser;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s",
+                        &str, &str_len) == FAILURE) {
+        RETURN_NULL();
+    }
+
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "getlink", ct, Q_RETURN_ARG(QStringList, qlist), Q_ARG(const char*, str));
+
+        array_init(return_value);
+
+        for (int i=0; i<qlist.count(); i++)
+        {
+            char *str = strdup_qstring(qlist.at(i));
+            add_next_index_string(return_value, str, 1);
+            delete str;
+        }
+    }
+    else {
+        RETURN_FALSE;
+    }
+}
+
+
+
+PHP_METHOD(PhpBrowser, getimglink)
+{
+    zval *zobj;
+    PhpBrowser *browser;
+    QStringList qlist;
+	char *str;
+    int str_len;
+    zval *zelem;
+
+    zobj = getThis();
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(zobj TSRMLS_CC);
+    browser = obj->browser;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s",
+                        &str, &str_len) == FAILURE) {
+        RETURN_NULL();
+    }
+
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "getimglink", ct, Q_RETURN_ARG(QStringList, qlist), Q_ARG(const char*, str));
+
+        array_init(return_value);
+
+        for (int i=0; i<qlist.count(); i++)
+        {
+            char *str = strdup_qstring(qlist.at(i));
+            add_next_index_string(return_value, str, 1);
+            delete str;
+        }
+    }
+    else {
+        RETURN_FALSE;
+    }
+}
+
+
+
+PHP_METHOD(PhpBrowser, getattr)
+{
+    zval *zobj;
+    PhpBrowser *browser;
+    QStringList qlist;
+	char *str;
+    int str_len;
+	char *str2;
+    int str_len2;
+    zval *zelem;
+
+    zobj = getThis();
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(zobj TSRMLS_CC);
+    browser = obj->browser;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "ss",
+                        &str, &str_len, &str2, &str_len2) == FAILURE) {
+        RETURN_NULL();
+    }
+
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "getattr", ct, Q_RETURN_ARG(QStringList, qlist), Q_ARG(const char*, str), Q_ARG(const char*, str2));
+
+        array_init(return_value);
+
+        for (int i=0; i<qlist.count(); i++)
+        {
+            char *str = strdup_qstring(qlist.at(i));
+            add_next_index_string(return_value, str, 1);
+            delete str;
+        }
+    }
+    else {
+        RETURN_FALSE;
+    }
+}
+
+
+
+PHP_METHOD(PhpBrowser, console)
+{
+    PhpBrowser *browser;
+    char *ret;
+
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
+    browser = obj->browser;
+        
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "console", ct, Q_RETURN_ARG(char*, ret));
+        RETVAL_STRING(ret, 1);
+        delete ret;
+    }
+    else {
+        RETURN_NULL();
+    }
+}
+
+
+PHP_METHOD(PhpBrowser, clearConsole)
+{
+    PhpBrowser *browser;
+    char *ret;
+
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
+    browser = obj->browser;
+        
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "clearConsole", ct);
+		RETURN_TRUE;
+    }
+    else {
+        RETURN_FALSE;
+    }
+}
+
+
+
+PHP_METHOD(PhpBrowser, getCookies)
+{
+    zval *zobj;
+    PhpBrowser *browser;
+    QMapParams qmap;
+
+    zobj = getThis();
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(zobj TSRMLS_CC);
+    browser = obj->browser;
+
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "getCookies", ct, Q_RETURN_ARG(QMapParams, qmap));
+
+        array_init(return_value);
+
+		QMapParams::iterator i;
+		for (i = qmap.begin(); i != qmap.end(); ++i)
+		{
+			char *strkey = strdup_qstring(i.key());
+			char *strval = strdup_qstring(i.value());
+			add_assoc_string(return_value, strkey, strval, 1);
+            delete strkey;
+			delete strval;
+        }
+    }
+    else {
+        RETURN_FALSE;
+    }
+}
+
+
+
+PHP_METHOD(PhpBrowser, clearCookies)
+{
+    PhpBrowser *browser;
+    char *ret;
+
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
+    browser = obj->browser;
+        
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "clearCookies", ct);
+		RETURN_TRUE;
+    }
+    else {
+        RETURN_FALSE;
+    }
+}
+
+
+
+PHP_METHOD(PhpBrowser, getCurrentProxy)
+{
+    PhpBrowser *browser;
+    char *ret;
+
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
+    browser = obj->browser;
+        
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "getCurrentProxy2", ct, Q_RETURN_ARG(char*, ret));
+        RETVAL_STRING(ret, 1);
+        delete ret;
+    }
+    else {
+        RETURN_NULL();
+    }
+}
+
+
+PHP_METHOD(PhpBrowser, setUserAgent)
+{
+    PhpBrowser *browser;
+    char *str;
+    int str_len;
+    int res;
+
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
+    browser = obj->browser;
+        
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "s",
+                        &str, &str_len) == FAILURE) {
+        RETURN_NULL();
+    }
+        
+    if (browser != NULL) {
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "setUserAgent", ct, Q_ARG(const char*, str));
+        RETURN_TRUE;
+    }
+    else {
+		RETURN_FALSE;
+    }
+}
+
+
+
+PHP_METHOD(PhpBrowser, setCookiesForUrl)
+{
+    PhpBrowser *browser;
+    zval *arr;
+	char *str;
+    int str_len;
+    bool ischeck;
+    int res;
+
+    phpbrowser_object *obj = (phpbrowser_object *)zend_object_store_get_object(getThis() TSRMLS_CC);
+    browser = obj->browser;
+        
+    if (zend_parse_parameters(ZEND_NUM_ARGS() TSRMLS_CC, "sa",
+                        &str, &str_len, &arr) == FAILURE) {
+        RETURN_NULL();
+    }
+        
+    if (browser != NULL)
+    {
+        HashTable *arrht = Z_ARRVAL_P(arr);
+        QMapParams qmap;        
+
+        for(zend_hash_internal_pointer_reset(arrht);
+            zend_hash_has_more_elements(arrht) == SUCCESS;
+            zend_hash_move_forward(arrht))
+        {
+            zval **ppzval;
+			char *key;
+			uint klen;
+			ulong index;
+
+			if (zend_hash_get_current_key_ex(arrht, &key, &klen, &index, 1, NULL) == HASH_KEY_IS_STRING) 
+			{
+				if (zend_hash_get_current_data(arrht, (void**)&ppzval) == FAILURE) {
+             	   continue;
+	            }
+
+				char *val = estrdup(Z_STRVAL_PP(ppzval));
+	            qmap[QString(key)] = QString(val);
+	            efree(val);
+		    }
+        }
+
+        Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
+        QMetaObject::invokeMethod(browser, "setCookiesForUrl", ct, Q_ARG(const char *, str), Q_ARG(QMapParams&, qmap));
+        RETURN_TRUE;
+    }
+    else {
+        RETURN_FALSE;
+    }
+}
+
 
 
 
@@ -1448,6 +1833,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phpbrowser_load, 0, 0, 1)
     ZEND_ARG_INFO(0, url)
 	ZEND_ARG_INFO(0, samewnd)
+	ZEND_ARG_INFO(0, timeout)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phpbrowser_click, 0, 0, 1)
@@ -1491,35 +1877,53 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phpbrowser_setimageloading, 0, 0, 1)
 	ZEND_ARG_INFO(0, isload)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phpbrowser_setcookiesforurl, 0, 0, 2)
+	ZEND_ARG_INFO(0, url)
+	ZEND_ARG_ARRAY_INFO(0, cookies, 0)
+ZEND_END_ARG_INFO()
+
+
 
 const zend_function_entry phpbrowser_methods[] = {
-    PHP_ME(PhpBrowser,  __construct,     arginfo_phpbrowser_void, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
-    PHP_ME(PhpBrowser,  load,            arginfo_phpbrowser_load, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  title,           arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  click,           arginfo_phpbrowser_click, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  elements,        arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  download,        arginfo_phpbrowser_download, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  back,            arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  wait,            arginfo_phpbrowser_wait, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  scroll,          arginfo_phpbrowser_scroll, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  fill,            arginfo_phpbrowser_fill, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  check,           arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  uncheck,         arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  radio,           arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  select,          arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  selectByText,    arginfo_phpbrowser_fill, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  selectByValue,   arginfo_phpbrowser_fill, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  fillfile,        arginfo_phpbrowser_fill, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  setProxyList,    arginfo_phpbrowser_setproxylist, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  proxyList,       arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  html,            arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  show,            arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  hide,            arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  url,             arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  requestedUrl,    arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
-    PHP_ME(PhpBrowser,  setHtml,         arginfo_phpbrowser_sethtml, ZEND_ACC_PUBLIC)    
-    PHP_ME(PhpBrowser,  setImageLoading, arginfo_phpbrowser_setimageloading, ZEND_ACC_PUBLIC)
-    {NULL, NULL, NULL, 0, 0}
+    PHP_ME(PhpBrowser,  __construct,         arginfo_phpbrowser_void, ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
+    PHP_ME(PhpBrowser,  load,                arginfo_phpbrowser_load, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  title,               arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  click,               arginfo_phpbrowser_click, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  elements,            arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  download,            arginfo_phpbrowser_download, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  back,                arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  wait,                arginfo_phpbrowser_wait, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  scroll,              arginfo_phpbrowser_scroll, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  fill,                arginfo_phpbrowser_fill, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  fill2,               arginfo_phpbrowser_fill, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  check,               arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  uncheck,             arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  radio,               arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  select,              arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  selectByText,        arginfo_phpbrowser_fill, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  selectByValue,       arginfo_phpbrowser_fill, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  fillfile,            arginfo_phpbrowser_fill, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  setProxyList,        arginfo_phpbrowser_setproxylist, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  proxyList,           arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  html,                arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  show,                arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  hide,                arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  url,                 arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  requestedUrl,        arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  setHtml,             arginfo_phpbrowser_sethtml, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  setImageLoading,     arginfo_phpbrowser_setimageloading, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  gettext,             arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  getlink,             arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  getimglink,          arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  getattr,		     arginfo_phpbrowser_fill, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  console,             arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  clearConsole,        arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  getCookies,          arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  clearCookies,        arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  getCurrentProxy,     arginfo_phpbrowser_void, ZEND_ACC_PUBLIC)
+    PHP_ME(PhpBrowser,  setUserAgent,        arginfo_phpbrowser_xpath, ZEND_ACC_PUBLIC)
+	PHP_ME(PhpBrowser,  setCookiesForUrl,    arginfo_phpbrowser_setcookiesforurl, ZEND_ACC_PUBLIC)
+	{NULL, NULL, NULL, 0, 0}
 };
 
 

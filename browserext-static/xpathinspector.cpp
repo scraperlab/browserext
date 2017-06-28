@@ -291,7 +291,7 @@ QTreeWidgetItem* XPathInspector::findTreeItemAndSelect(const QWebElement & elem)
 		current = current.parent();
 	}
 
-	QTreeWidgetItem *topitem;
+	QTreeWidgetItem *topitem = NULL;
 	for (int i=0; i<tree->topLevelItemCount(); i++)
 	{
 		QTreeWidgetItem *item = tree->topLevelItem(i);
@@ -306,14 +306,17 @@ QTreeWidgetItem* XPathInspector::findTreeItemAndSelect(const QWebElement & elem)
 
 	for (int i=1; i<patharr.count(); i++)	
 	{
-		for (int j=0; j<topitem->childCount(); j++)
+		if (topitem != NULL)
 		{
-			QWebElement node = topitem->child(j)->data(0, Qt::UserRole).value<QWebElement>();
-			if (patharr.at(i) == node)
+			for (int j=0; j<topitem->childCount(); j++)
 			{
-				topitem = topitem->child(j);
-				tree->expandItem(topitem);
-				break;
+				QWebElement node = topitem->child(j)->data(0, Qt::UserRole).value<QWebElement>();
+				if (patharr.at(i) == node)
+				{
+					topitem = topitem->child(j);
+					tree->expandItem(topitem);
+					break;
+				}
 			}
 		}
 	}
