@@ -121,7 +121,7 @@ elements, only the first is taken.
 If the element is found returns true, otherwise false.
 
 
-### метод fill2
+### method fill2
 
 `public bool fill2(string $xpath, string $value);`
 
