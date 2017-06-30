@@ -669,6 +669,12 @@ int PhpBrowser::setproxylist(QStringList & strlist, bool ischeck, QString site, 
 }
 
 
+int PhpBrowser::setproxylist2(QStringList & strlist, bool ischeck)
+{
+	return setproxylist(strlist, ischeck);
+}
+
+
 QStringList PhpBrowser::proxylist()
 {
 	QStringList strlist;

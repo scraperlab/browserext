@@ -759,8 +759,9 @@ PHP_METHOD(PhpBrowser, setProxyList)
 
         Qt::ConnectionType ct = Qt::BlockingQueuedConnection;
         ischeck = zcheck != 0;
-        QMetaObject::invokeMethod(browser, "setproxylist", ct, Q_RETURN_ARG(int, res), Q_ARG(QStringList&, strlist), Q_ARG(bool, ischeck));
-        RETURN_LONG(res);
+        QMetaObject::invokeMethod(browser, "setproxylist2", ct, Q_RETURN_ARG(int, res), Q_ARG(QStringList&, strlist), Q_ARG(bool, ischeck));
+		long res2 = res;
+        RETURN_LONG(res2);
     }
     else {
         RETURN_NULL();

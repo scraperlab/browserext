@@ -591,3 +591,10 @@ firstChild, lastChild.
 иначе выдает false.
 
 
+### метод jsexec
+
+`public bool jsexec(string jscode);`
+
+Выполняет javascript код.
+
+

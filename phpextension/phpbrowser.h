@@ -29,6 +29,7 @@ public:
 	void setLastScroll(QPoint & point);
 	QPoint lastScroll();
 	void setFilename(const QString & filename);
+	void setUserAgent(const QString & ua);
 
 protected Q_SLOTS:
 	void handleSslErrors(QNetworkReply* reply, const QList<QSslError> &errors);
@@ -40,10 +41,12 @@ protected:
 	virtual bool javaScriptPrompt(QWebFrame * frame, const QString & msg, const QString & defaultValue, QString * result);
 	virtual bool acceptNavigationRequest(QWebFrame * frame, const QNetworkRequest & request, NavigationType type);
 	virtual QString chooseFile(QWebFrame *parentFrame, const QString & suggestedFile);
+	virtual QString userAgentForUrl(const QUrl & url) const;
 
 	QString output;
 	QPoint last_scroll;
 	QString filename;
+	QString useragent;
 };
 
 
@@ -104,6 +107,7 @@ public:
 	void selectElement(QWebElement & elem, bool setselect = true);
 	QString console();
 	void clearConsole();
+	void setUserAgent(const QString & ua);
 
 	friend class PhpWebPage;
 	friend class PhpBrowser;
@@ -186,6 +190,7 @@ public Q_SLOTS:
 	void wait(int seconds);
 	int scroll(int numscreen);
 	int setproxylist(QStringList & strlist, bool ischeck = true, QString site = "http://www.google.com", QString findstr = "google");
+	int setproxylist2(QStringList & strlist, bool ischeck = true);
 	QStringList proxylist();
 	char *html();
 	char *url();
@@ -201,6 +206,8 @@ public Q_SLOTS:
 	QString getCurrentProxy();
 	char *getCurrentProxy2();
 	void sendEvent(const QString& type, const QVariant& arg1 = QVariant(), const QVariant& arg2 = QVariant(), const QString& mouseButton = QString(), const QVariant& modifierArg = QVariant());
+	void setUserAgent(const char *ua);
+	void setCookiesForUrl(const char* url, QMapParams & qmap);
 
 protected Q_SLOTS:
 	void setEdit(const QUrl & url);
@@ -234,6 +241,7 @@ protected:
 	int currentProxy;
 	bool canclose;
 	bool isLoadImages;
+	QString useragent;
 public:
 	int ProxyCheckThreads;
 	QString downloadDirectory;

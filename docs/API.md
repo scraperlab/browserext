@@ -121,7 +121,7 @@ elements, only the first is taken.
 If the element is found returns true, otherwise false.
 
 
-### method fill2
+### метод fill2
 
 `public bool fill2(string $xpath, string $value);`
 
@@ -534,5 +534,12 @@ The point specifies the current context.
 
 Clicks on the element. Returns true if successful, for example,
 when a new page is loaded, otherwise provides false.
+
+
+### method jsexec
+
+`public bool jsexec(string jscode);`
+
+Executes javascript code.
 
 

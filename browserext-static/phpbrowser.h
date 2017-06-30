@@ -190,6 +190,7 @@ public Q_SLOTS:
 	void wait(int seconds);
 	int scroll(int numscreen);
 	int setproxylist(QStringList & strlist, bool ischeck = true, QString site = "http://www.google.com", QString findstr = "google");
+	int setproxylist2(QStringList & strlist, bool ischeck = true);
 	QStringList proxylist();
 	char *html();
 	char *url();
