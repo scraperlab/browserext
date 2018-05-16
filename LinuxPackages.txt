@@ -24,4 +24,4 @@ yum install qt5-qtbase-devel
 yum install qt5-qtwebkit-devel
 yum install Xvfb
 yum install mesa-dri-drivers
-
+yum install qt5-qtimageformats
