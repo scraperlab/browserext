@@ -45,7 +45,7 @@ Installation
 It requires X11 Server. On the server without desktop you must use Xvfb.
 For loading Xvfb at system startup add this line to /etc/rc.local:
 
-`Xvfb :0 > /dev/null 2>&1 &`
+`Xvfb :0 -screen 0 1024x768x16 > /dev/null 2>&1 &`
 
 For user, from which web server is running, you must set 
 the environment variable DISPLAY with server number with which

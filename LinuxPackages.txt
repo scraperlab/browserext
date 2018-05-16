@@ -1,4 +1,5 @@
 QT5 packages in Ubuntu (Debian):
+--------------------------------
 
 qtbase5-dev
 qt5-qmake
@@ -6,3 +7,21 @@ libqt5webkit5
 libqt5webkit5-dev
 qt5-image-formats-plugins
 qt5-default
+
+
+
+Сommands for installing packages in Centos 7 for QT5:
+-----------------------------------------------------
+
+yum install -y epel-release
+yum -y update
+
+yum install gcc-c++
+yum install make
+yum install php-devel
+yum install qt5-qtbase
+yum install qt5-qtbase-devel
+yum install qt5-qtwebkit-devel
+yum install Xvfb
+yum install mesa-dri-drivers
+
