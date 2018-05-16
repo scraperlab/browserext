@@ -82,7 +82,12 @@ void PhpBrowser::newTab()
 	if (isUseCache)
 	{
 		QNetworkDiskCache *diskCache = new QNetworkDiskCache(page);
-		diskCache->setCacheDirectory("cacheDir");
+#ifdef Q_OS_WIN
+    QString cacheDirLocation = "cacheDir";
+#elif defined(Q_OS_LINUX)
+    QString cacheDirLocation = "/var/tmp/cacheDir";
+#endif
+		diskCache->setCacheDirectory(cacheDirLocation);
 		page->networkAccessManager()->setCache(diskCache);
 	}
 
